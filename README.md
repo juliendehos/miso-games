@@ -8,15 +8,14 @@
 ## Two-player games
 
 - [ ] [Tic-tac-toe](https://en.wikipedia.org/wiki/Tic-tac-toe)
-- [ ] [Connect Four](https://en.wikipedia.org/wiki/Connect_Four)
-- [ ] [Reversi/Othello](https://en.wikipedia.org/wiki/Reversi)
 - [ ] [Gomoku](https://en.wikipedia.org/wiki/Gomoku)
+- [ ] [Breakthrough](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
+- [ ] [Reversi/Othello](https://en.wikipedia.org/wiki/Reversi)
 
 ## Bots
 
 - [ ] Random
 - [ ] Monte-Carlo
-- [ ] Monte-Carlo Tree Search
 
 ## Build and run
 

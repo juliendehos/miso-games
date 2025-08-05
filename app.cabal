@@ -29,6 +29,7 @@ executable app
   main-is:
     Main.hs
   other-modules:
+    Game
     App.Component
     App.Model
     App.Update
@@ -40,8 +41,15 @@ executable app
     Minesweeper.Update
     Minesweeper.View
     Tictactoe.Component
+    Tictactoe.Game
   build-depends:
-    base, massiv, miso, mtl, primitive, random
+    base,
+    massiv,
+    miso,
+    mtl,
+    primitive,
+    random,
+    vector
   default-language:
     GHC2024
   default-extensions:
