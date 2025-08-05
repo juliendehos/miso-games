@@ -3,10 +3,10 @@ import Control.Monad.IO.Class (liftIO)
 import Miso
 import System.Random (getStdGen)
 
-import Helpers
-import Model
-import Update
-import View
+import Minesweeper.Helpers
+import Minesweeper.Model
+import Minesweeper.Update
+import Minesweeper.View
 
 main :: IO ()
 main = run $ do

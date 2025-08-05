@@ -1,5 +1,5 @@
 
-module Game
+module Minesweeper.Game
   ( Cell(..)
   , Game
   , Move(..)

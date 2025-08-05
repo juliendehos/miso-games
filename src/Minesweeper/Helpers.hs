@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Helpers where
+module Minesweeper.Helpers where
 
 import Miso.String (MisoString)
 import Miso.Style qualified as Style

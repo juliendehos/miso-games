@@ -1,13 +1,13 @@
 
-module Model where
+module Minesweeper.Model where
 
 import Control.Monad.Primitive
 import Miso.Lens
 import Miso.Lens.TH
 import System.Random.Stateful
 
-import Game
-import Helpers
+import Minesweeper.Game
+import Minesweeper.Helpers
 
 data Model = Model
   { _mGame :: Game

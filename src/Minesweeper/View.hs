@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module View where
+module Minesweeper.View where
 
 import Control.Monad (forM_, when)
 import Miso
@@ -9,10 +9,10 @@ import Miso.Lens
 import Miso.String (ms)
 import Miso.Style qualified as Style
 
-import Game
-import Helpers
-import Model
-import Update
+import Minesweeper.Game
+import Minesweeper.Helpers
+import Minesweeper.Model
+import Minesweeper.Update
 
 -------------------------------------------------------------------------------
 -- params

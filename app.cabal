@@ -29,7 +29,11 @@ executable app
   main-is:
     Main.hs
   other-modules:
-    Game Helpers Model Update View
+    Minesweeper.Game
+    Minesweeper.Helpers
+    Minesweeper.Model
+    Minesweeper.Update
+    Minesweeper.View
   build-depends:
     base, massiv, miso, mtl, primitive, random
   default-language:

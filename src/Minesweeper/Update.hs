@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Update where
+module Minesweeper.Update where
 
 import Control.Monad.IO.Class (liftIO)
 import Miso
 import Miso.Lens
 import Miso.String (ms)
 
-import Game
-import Helpers
-import Model
+import Minesweeper.Game
+import Minesweeper.Helpers
+import Minesweeper.Model
 
 -------------------------------------------------------------------------------
 -- Action
