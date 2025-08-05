@@ -29,6 +29,10 @@ executable app
   main-is:
     Main.hs
   other-modules:
+    App.Component
+    App.Model
+    App.Update
+    App.View
     Minesweeper.Game
     Minesweeper.Helpers
     Minesweeper.Model
