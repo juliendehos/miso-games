@@ -7,7 +7,7 @@ import Miso.Lens.TH
 import System.Random.Stateful
 
 data Model = Model
-  { _mGen :: StdGen
+  { _mGen :: StdGen   -- TODO TVar StdGen ?
   } deriving (Eq)
 
 makeLenses ''Model

@@ -10,8 +10,8 @@ main :: IO ()
 main = run $ do
   gen <- getStdGen
   model <- liftIO (mkModel gen)
-  let component = mkComponent model
-  startComponent component
+  let appComponent = mkComponent model
+  startComponent appComponent
     { logLevel = DebugAll }
 
 #ifdef WASM

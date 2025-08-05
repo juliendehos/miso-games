@@ -39,7 +39,7 @@ cs09 = cellSizeD * 0.9
 
 viewModel :: Model -> View Model Action
 viewModel model = div_ [] 
-  [ h1_ [] [ "miso-minesweeper" ]
+  [ h2_ [] [ "Minesweeper" ]
   , p_ [] 
       [ button_ [ onClick (ActionAskReset ModeBeginner) ]     [ "beginner" ]
       , button_ [ onClick (ActionAskReset ModeIntermediate) ] [ "intermediate" ]

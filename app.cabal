@@ -33,11 +33,13 @@ executable app
     App.Model
     App.Update
     App.View
+    Minesweeper.Component
     Minesweeper.Game
     Minesweeper.Helpers
     Minesweeper.Model
     Minesweeper.Update
     Minesweeper.View
+    Tictactoe.Component
   build-depends:
     base, massiv, miso, mtl, primitive, random
   default-language:
