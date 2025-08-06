@@ -37,14 +37,17 @@ mkModel = pure . Model Tictactoe
 -------------------------------------------------------------------------------
 
 newtype Action 
-  = ActionAskGame GameType
+  = ActionAskGame MisoString
 
 updateModel :: Action -> Transition Model Action
 updateModel (ActionAskGame gt) = do
   case gt of
-    Tictactoe -> io_ $ consoleLog "tictactoe"
-    Minesweeper -> io_ $ consoleLog "minesweeper"
-  mGameType .= gt
+    "Tictactoe" -> do
+      mGameType .= Tictactoe
+      io_ $ consoleLog "tictactoe"
+    "Minesweeper" -> do
+      mGameType .= Minesweeper
+      io_ $ consoleLog "minesweeper"
 
 -------------------------------------------------------------------------------
 -- View
@@ -56,9 +59,9 @@ viewModel Model{..} =
     [ h1_ [] [ "miso-games" ]
     , p_ [] 
         [ text "game: "
-        , select_ []
-            [ option_ [ onClick (ActionAskGame Tictactoe) ] [ "Tictactoe" ]
-            , option_ [ onClick (ActionAskGame Minesweeper) ] [ "Minesweeper" ]
+        , select_ [ onChange ActionAskGame ]
+            [ option_ [] [ "Tictactoe" ]
+            , option_ [] [ "Minesweeper" ]
             ]
         ]
     -- , p_ [] [ "player 2: TODO" ]
