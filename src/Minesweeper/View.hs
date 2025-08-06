@@ -2,20 +2,21 @@
 
 module Minesweeper.View where
 
-import Control.Monad (forM_, when)
+import Control.Monad (when)
 import Miso
 import Miso.Canvas as Canvas
 import Miso.Lens
 import Miso.String (ms)
 import Miso.Style qualified as Style
 
+import Helpers.Canvas
 import Minesweeper.Game
 import Minesweeper.Helpers
 import Minesweeper.Model
 import Minesweeper.Update
 
 -------------------------------------------------------------------------------
--- params
+-- helpers
 -------------------------------------------------------------------------------
 
 cellSizeD :: Double
@@ -86,32 +87,13 @@ drawCanvas model () = do
       h = fromIntegral $ ni * cellSize
   clearRect (0, 0, w, h)
   font cellFont
-  drawBackground w h
+  drawBackground colorNo w h
   forGame (model ^. mGame) drawGameCell
-  drawGrid ni nj w h
+  drawGrid Style.black ni nj cellSize cellSize w h
 
 -------------------------------------------------------------------------------
 -- drawing functions
 -------------------------------------------------------------------------------
-
-drawGrid :: Int -> Int -> Double -> Double -> Canvas ()
-drawGrid ni nj w h = do
-  fillStyle (color Style.black)
-  beginPath ()
-  forM_ [1 .. nj-1] $ \j -> do
-    let x = fromIntegral (j * cellSize)
-    moveTo (x, 0)
-    lineTo (x, h)
-  forM_ [1 .. ni-1] $ \i -> do
-    let y = fromIntegral (i * cellSize)
-    moveTo (0, y)
-    lineTo (w, y)
-  stroke ()
-
-drawBackground :: Double -> Double -> Canvas ()
-drawBackground w h = do
-  fillStyle (color colorNo)
-  fillRect (0, 0, w, h)
 
 drawCell :: Style.Color -> Canvas ()
 drawCell c = do
@@ -122,7 +104,7 @@ drawMine :: Bool -> Int -> Int -> Canvas ()
 drawMine wrong i j = do
 
   save ()
-  translate $ ij2xy i j
+  translate $ ij2xy' i j
 
   when wrong $ drawCell colorWrongMine
 
@@ -153,7 +135,7 @@ drawFlag :: Bool -> Int -> Int -> Canvas ()
 drawFlag wrong i j = do
 
   save ()
-  translate $ ij2xy i j
+  translate $ ij2xy' i j
 
   when wrong $ drawCell colorWrongFlag
 
@@ -173,7 +155,7 @@ drawFlag wrong i j = do
 drawFree :: Int -> Int -> Int -> Canvas ()
 drawFree i j n = do
   save ()
-  translate $ ij2xy i j
+  translate $ ij2xy' i j
   drawCell colorYes
   fillStyle (color $ n2color n)
   when (n > 0) $ fillText (ms (show n), cs03, cs08)

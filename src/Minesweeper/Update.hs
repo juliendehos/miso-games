@@ -38,7 +38,7 @@ updateModel (ActionSetGame game) =
   mGame .= game
 
 updateModel (ActionAskPlay event) = do
-  let (i, j) = uncurry xy2ij $ offset event 
+  let (i, j) = uncurry xy2ij' $ offset event 
   game <- use mGame
   case button event of
     0 -> do

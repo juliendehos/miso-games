@@ -16,7 +16,8 @@ viewModel :: Model -> View Model Action
 viewModel _model = 
   div_ [] 
     [ h1_ [] [ "miso-games" ]
-    , p_ [] [ "TODO" ]
+    , p_ [] [ "game: TODO" ]
+    , p_ [] [ "player 2: TODO" ]
     , div_ [] +> tictactoeComponent
     ]
 

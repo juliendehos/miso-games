@@ -8,7 +8,6 @@ import Miso
 import System.Random.Stateful
 
 import Minesweeper.Model
-import Minesweeper.Helpers
 import Minesweeper.Update
 import Minesweeper.View
 

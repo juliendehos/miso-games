@@ -30,6 +30,7 @@ executable app
     Main.hs
   other-modules:
     Game
+    Helpers.Canvas
     App.Component
     App.Model
     App.Update

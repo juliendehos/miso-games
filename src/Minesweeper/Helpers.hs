@@ -5,6 +5,12 @@ module Minesweeper.Helpers where
 import Miso.String (MisoString)
 import Miso.Style qualified as Style
 
+import Helpers.Canvas
+
+-------------------------------------------------------------------------------
+-- params
+-------------------------------------------------------------------------------
+
 cellSize :: Int
 cellSize = 25
 
@@ -26,20 +32,14 @@ n2color = \case
   5 -> Style.Hex "7B0000"
   _ -> Style.black
 
-ij2xy :: Int -> Int -> (Double, Double)
-ij2xy i j = (fromIntegral (j*cellSize), fromIntegral (i*cellSize))
+-------------------------------------------------------------------------------
+-- helpers
+-------------------------------------------------------------------------------
 
-xy2ij :: Double -> Double -> (Int, Int)
-xy2ij x y = (floor y `div` cellSize, floor x `div` cellSize)
+ij2xy' :: Int -> Int -> (Double, Double)
+ij2xy' = ij2xy cellSize cellSize
 
-data Mode
-  = ModeBeginner
-  | ModeIntermediate
-  | ModeExpert
+xy2ij' :: Double -> Double -> (Int, Int)
+xy2ij' = xy2ij cellSize cellSize
 
-mode2infos :: Mode -> (Int, Int, Int)
-mode2infos = \case
-  ModeBeginner      -> (9, 9, 10)
-  ModeIntermediate  -> (16, 16, 40)
-  ModeExpert        -> (16, 30, 99)
 
