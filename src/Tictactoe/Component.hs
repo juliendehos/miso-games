@@ -5,23 +5,13 @@ module Tictactoe.Component (mkComponent) where
 
 import Miso
 import Miso.Lens
+import Miso.Lens.TH
 import Miso.Canvas (Canvas, canvas)
 import Miso.Canvas qualified as Canvas 
 import Miso.Style qualified as Style
 
 import Helpers.Canvas
 import Tictactoe.Game
-
--------------------------------------------------------------------------------
--- component
--------------------------------------------------------------------------------
-
-mkComponent :: Component m Model Action
-mkComponent = do
-  let initialModel = mkModel
-  (component initialModel updateModel viewModel)
-    { events = defaultEvents <> pointerEvents
-    }
 
 -------------------------------------------------------------------------------
 -- params
@@ -35,6 +25,10 @@ fgColor = Style.red
 cellSizeD, canvasSizeD :: Double
 cellSizeD = 100
 canvasSizeD = cellSizeD * 3
+
+-------------------------------------------------------------------------------
+-- helpers
+-------------------------------------------------------------------------------
 
 cellSize :: Int
 cellSize = round cellSizeD
@@ -56,37 +50,55 @@ cs04 = cellSizeD * 0.4
 cs08 = cellSizeD * 0.8
 
 -------------------------------------------------------------------------------
--- model
--------------------------------------------------------------------------------
-
-newtype Model = Model
-  { _modelGame :: Game
-  } deriving (Eq)
-
-mkModel :: Model
-mkModel = Model mkGame
-
-modelGame :: Lens Model Game
-modelGame = lens _modelGame $ \record field -> record { _modelGame = field }
-
--------------------------------------------------------------------------------
 -- action
 -------------------------------------------------------------------------------
 
-newtype Action 
+data Action 
   = ActionAskPlay PointerEvent
+  | ActionNewGame
+
+-------------------------------------------------------------------------------
+-- model
+-------------------------------------------------------------------------------
+
+data Model = Model
+  { _modelGame  :: Game
+  , _modelLog   :: MisoString
+  } deriving (Eq)
+
+mkModel :: Model
+mkModel = Model mkGame "this is Tictactoe"
+
+makeLenses ''Model
+
+{-
+modelGame :: Lens Model Game
+modelGame = lens _modelGame $ \record field -> record { _modelGame = field }
+
+modelLog :: Lens Model MisoString
+modelLog = lens _modelLog $ \record field -> record { _modelLog = field }
+-}
 
 -------------------------------------------------------------------------------
 -- update
 -------------------------------------------------------------------------------
 
--- updateModel :: Applicative f => Action -> f Action
 updateModel :: Action -> Effect parentModel Model Action
 
 updateModel (ActionAskPlay event) = do
+  player <- getCurrentPlayer <$> use modelGame
   let (i, j) = uncurry xy2ij' $ offset event 
-  io_ (consoleLog ("Tictactoe play " <> ms (show i) <> " " <> ms (show j)))
+      iStr = ms $ show i
+      jStr = ms $ show j
+      pStr = case player of
+        Player1 -> "X"
+        Player2 -> "O"
   modelGame %= play (i, j)
+  modelLog .= pStr <> " played " <> iStr <> " " <> jStr
+
+updateModel ActionNewGame = do
+  modelGame %= Tictactoe.Game.reset
+  modelLog .= "new game"
 
 -------------------------------------------------------------------------------
 -- view
@@ -95,7 +107,8 @@ updateModel (ActionAskPlay event) = do
 viewModel :: Model -> View parent Action
 viewModel model@Model{..} =
   div_ [] 
-    [ canvas 
+    [ p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
+    , canvas 
         [ width_ (ms $ show canvasSizeD)
         , height_ (ms $ show canvasSizeD)
         , Style.style_  [Style.border "2px solid black"]
@@ -103,7 +116,8 @@ viewModel model@Model{..} =
         ]
       initCanvas
       (drawCanvas model)
-    , p_ [] [ fmtStatus (getStatus _modelGame)]
+    , p_ [] [ text ("status: " <> fmtStatus (getStatus _modelGame)) ]
+    , p_ [] [ text ("log: " <> _modelLog) ]
     ]
   where
     fmtStatus = \case
@@ -168,4 +182,15 @@ drawO bg i j = do
 
 getBgColor :: Game -> Style.Color
 getBgColor game = if isRunning game then bgColor else bgColorEnd
+
+-------------------------------------------------------------------------------
+-- component
+-------------------------------------------------------------------------------
+
+mkComponent :: Component m Model Action
+mkComponent = do
+  let initialModel = mkModel
+  (component initialModel updateModel viewModel)
+    { events = defaultEvents <> pointerEvents
+    }
 
