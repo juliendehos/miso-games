@@ -10,8 +10,8 @@ import Miso.Lens
 import Miso.Lens.TH
 import System.Random.Stateful
 
-import Minesweeper.Component as Tictactoe
-import Tictactoe.Component as Minesweeper
+import Minesweeper.Component as Minesweeper
+import Tictactoe.Component as Tictactoe
 
 -------------------------------------------------------------------------------
 -- Model
@@ -62,17 +62,25 @@ viewModel Model{..} =
             ]
         ]
     -- , p_ [] [ "player 2: TODO" ]
-    , gameH2
     , gameDiv
+    , h2_ [] [ "test tictactoe" ]
+    , div_ [] +> Tictactoe.mkComponent
+    , h2_ [] [ "test minesweeper" ]
+    , div_ [] +> Minesweeper.mkComponent _mGen
     ]
 
   where
     gameDiv = case _mGameType of
-      Tictactoe   -> div_ [] +> Tictactoe.mkComponent
-      Minesweeper -> div_ [] +> Minesweeper.mkComponent   -- TODO gen
-    gameH2 = case _mGameType of
-      Tictactoe   -> h2_ [] [ "tictactoe" ]
-      Minesweeper -> h2_ [] [ "minesweeper" ]
+      Tictactoe   -> 
+        div_ []
+          [ h2_ [] [ "Tictactoe" ]
+          , div_ [] +> Tictactoe.mkComponent
+          ]
+      Minesweeper -> 
+        div_ []
+          [ h2_ [] [ "Minesweeper" ]
+          , div_ [] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
+          ]
 
 -------------------------------------------------------------------------------
 -- Component
