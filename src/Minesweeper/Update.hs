@@ -5,7 +5,6 @@ module Minesweeper.Update where
 import Control.Monad.IO.Class (liftIO)
 import Miso
 import Miso.Lens
-import Miso.String (ms)
 
 import Minesweeper.Game
 import Minesweeper.Helpers

@@ -6,7 +6,6 @@ import Control.Monad (when)
 import Miso
 import Miso.Canvas as Canvas
 import Miso.Lens
-import Miso.String (ms)
 import Miso.Style qualified as Style
 
 import Helpers.Canvas

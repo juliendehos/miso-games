@@ -4,6 +4,7 @@ module Tictactoe.Game
   ( Game
   , Status(..)
   , Player(..)
+  , Cell(..)
   , mkGame
   , reset
   , play
@@ -11,8 +12,7 @@ module Tictactoe.Game
   , getMoves
   , getStatus
   , getCurrentPlayer
-  , getCellsPlayer1
-  , getCellsPlayer2
+  , forGame
   , isRunning
   ) where
 
@@ -31,7 +31,7 @@ data Cell
   deriving (Eq)
 
 type Board = Vector Cell
-type Move = (Int, Int)
+type Move = (Int, Int)    -- TODO define a datatype for Move?
 
 data Game = Game
   { _gameBoard          :: Board
@@ -48,7 +48,7 @@ data Game = Game
 
 play :: Move -> Game -> Game
 play ij g@Game{..} =
-  if _gameBoard ! k /= CellEmpty
+  if not (isRunning g) || _gameBoard ! k /= CellEmpty
     then g
     else 
       Game b rm ms s _gameInitialPlayer np
@@ -92,18 +92,13 @@ getStatus = _gameStatus
 getCurrentPlayer :: Game -> Player
 getCurrentPlayer = _gameCurrentPlayer
 
-getCellsPlayer1 :: Game -> [(Int, Int)]
-getCellsPlayer1 = ifoldl f [] . _gameBoard
-  where
-    f acc k c = if c == CellPlayer1 then k2ij k : acc else acc
-
-getCellsPlayer2 :: Game -> [(Int, Int)]
-getCellsPlayer2 = ifoldl f [] . _gameBoard
-  where
-    f acc k c = if c == CellPlayer2 then k2ij k : acc else acc
-
 isRunning :: Game -> Bool
 isRunning Game{..} = _gameStatus == Player1Plays || _gameStatus == Player2Plays
+
+forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
+forGame game f = V.iforM_ (_gameBoard game) $ \k c -> 
+    let (i, j) = k2ij k
+    in f i j c
 
 -------------------------------------------------------------------------------
 -- internal

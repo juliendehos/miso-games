@@ -7,7 +7,6 @@ import Miso.Lens.TH
 import System.Random.Stateful
 
 import Minesweeper.Game
-import Minesweeper.Helpers
 
 data Model = Model
   { _mGame :: Game
