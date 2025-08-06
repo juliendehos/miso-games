@@ -4,7 +4,6 @@ import Miso
 import System.Random (getStdGen)
 
 import App.Component
-import App.Model
 
 main :: IO ()
 main = run $ do

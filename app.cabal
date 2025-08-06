@@ -32,9 +32,6 @@ executable app
     Game
     Helpers.Canvas
     App.Component
-    App.Model
-    App.Update
-    App.View
     Minesweeper.Component
     Minesweeper.Game
     Minesweeper.Helpers

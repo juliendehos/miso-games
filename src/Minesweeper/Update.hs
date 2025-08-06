@@ -18,13 +18,12 @@ data Action
   = ActionAskReset Mode
   | ActionAskPlay PointerEvent
   | ActionSetModel Model
-  | ActionSetGame Game
 
 -------------------------------------------------------------------------------
 -- update
 -------------------------------------------------------------------------------
 
-updateModel :: Action -> Transition Model Action
+updateModel :: Action -> Effect parentModel Model Action
 
 updateModel (ActionAskReset mode) = do
   model <- get
@@ -33,18 +32,14 @@ updateModel (ActionAskReset mode) = do
 updateModel (ActionSetModel model) = 
   put model
 
-updateModel (ActionSetGame game) = 
-  mGame .= game
-
 updateModel (ActionAskPlay event) = do
   let (i, j) = uncurry xy2ij' $ offset event 
-  game <- use mGame
   case button event of
     0 -> do
       io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
-      io (ActionSetGame <$> liftIO (play (MoveFree i j) game))
+      mGame %= play (MoveFree i j)
     1 -> do
       io_ (consoleLog ("playFlag " <> ms (show i) <> " " <> ms (show j)))
-      io (ActionSetGame <$> liftIO (play (MoveFlag i j) game))
+      mGame %= play (MoveFlag i j)
     _ -> pure ()
 

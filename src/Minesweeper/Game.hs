@@ -16,6 +16,7 @@ module Minesweeper.Game
 
 import Control.Monad (when)
 import Control.Monad.State
+import Control.Monad.ST
 import Data.Bool (bool)
 import Data.Massiv.Array as A
 import Miso.Lens
@@ -74,9 +75,9 @@ mkGame (ni, nj, nbMines) gen = do
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame game f = A.iforM_ (game ^. gCells) $ \(Ix2 i j) c -> f i j c
 
-play :: (PrimMonad m) => Move -> Game -> m Game
-play (MoveFlag i j) = execStateT (playFlag i j) 
-play (MoveFree i j) = execStateT (playFree i j) 
+play :: Move -> Game -> Game
+play (MoveFlag i j) game = runST $ execStateT (playFlag i j) game
+play (MoveFree i j) game = runST $ execStateT (playFree i j) game
 
 -------------------------------------------------------------------------------
 -- internal
