@@ -5,6 +5,7 @@ module Tictactoe.Game
   , Status(..)
   , Player(..)
   , Cell(..)
+  , Move(..)
   , mkGame
   , reset
   , play
@@ -31,7 +32,9 @@ data Cell
   deriving (Eq)
 
 type Board = Vector Cell
-type Move = (Int, Int)    -- TODO define a datatype for Move?
+
+data Move = Move Int Int
+  deriving (Eq)
 
 data Game = Game
   { _gameBoard          :: Board
@@ -46,32 +49,33 @@ data Game = Game
 -- export
 -------------------------------------------------------------------------------
 
-play :: Move -> Game -> Game
-play ij g@Game{..} =
+play :: Move -> Game -> Maybe Game
+play m g@Game{..} =
   if not (isRunning g) || _gameBoard ! k /= CellEmpty
-    then g
+    then Nothing
     else 
-      Game b rm ms s _gameInitialPlayer np
+      Just $ Game b rm ms s _gameInitialPlayer np
   where
-    k = ij2k ij
+    k = move2k m
     (c, np) = case _gameCurrentPlayer of
       Player1 -> (CellPlayer1, Player2)
       Player2 -> (CellPlayer2, Player1)
     b = _gameBoard // [(k, c)]
     rm = _gameRemMoves - 1
-    ms = filter (/=ij) _gameMoves
-    s = computeStatus ij c b rm
+    ms = filter (/=m) _gameMoves
+    s = computeStatus m c b rm
 
 mkGame :: Game
 mkGame = Game board 9 moves Player1Plays Player1 Player1
   where
     board = V.replicate 9 CellEmpty 
-    moves = [ (i, j) | i<-[0..2], j<-[0..2] ]
+    moves = [ Move i j | i<-[0..2], j<-[0..2] ]
 
 reset :: Game -> Game
 reset g0 = 
   mkGame 
     { _gameStatus = status
+    , _gameCurrentPlayer = player
     , _gameInitialPlayer = player
     }
   where
@@ -104,6 +108,9 @@ forGame game f = V.iforM_ (_gameBoard game) $ \k c ->
 -- internal
 -------------------------------------------------------------------------------
 
+move2k :: Move -> Int
+move2k (Move i j) = i*3 + j
+
 ij2k :: (Int, Int) -> Int
 ij2k (i, j) = i*3 + j
 
@@ -111,7 +118,7 @@ k2ij :: Int -> (Int, Int)
 k2ij k = (div k 3, mod k 3)
 
 computeStatus :: Move -> Cell -> Board -> Int -> Status
-computeStatus (i, j) c b rm =
+computeStatus (Move i j) c b rm =
   case (win, c, rm) of
     (True, CellPlayer1, _)  -> Player1Wins
     (True, CellPlayer2, _)  -> Player2Wins

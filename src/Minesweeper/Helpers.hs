@@ -37,7 +37,7 @@ n2color = \case
 -------------------------------------------------------------------------------
 
 ij2xy' :: Int -> Int -> (Double, Double)
-ij2xy' = ij2xy cellSize cellSize
+ij2xy' = ij2xyTL cellSize cellSize
 
 xy2ij' :: Double -> Double -> (Int, Int)
 xy2ij' = xy2ij cellSize cellSize
