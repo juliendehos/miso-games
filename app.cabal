@@ -32,14 +32,13 @@ executable app
     Game
     Helpers.Canvas
     App.Component
+    App.Model
     Minesweeper.Component
     Minesweeper.Game
-    Minesweeper.Helpers
     Minesweeper.Model
-    Minesweeper.Update
-    Minesweeper.View
     Tictactoe.Component
     Tictactoe.Game
+    Tictactoe.Model
   build-depends:
     base,
     massiv,

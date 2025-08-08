@@ -13,6 +13,7 @@ import Miso.Style qualified as Style
 
 import Helpers.Canvas
 import Tictactoe.Game
+import Tictactoe.Model
 
 -------------------------------------------------------------------------------
 -- params and helpers
@@ -43,20 +44,6 @@ ij2xyC' = ij2xyC cellSize cellSize
 data Action 
   = ActionAskPlay PointerEvent
   | ActionNewGame
-
--------------------------------------------------------------------------------
--- model
--------------------------------------------------------------------------------
-
-data Model = Model
-  { _modelGame    :: Game
-  , _modelLog     :: MisoString
-  } deriving (Eq)
-
-makeLenses ''Model
-
-mkModel :: Model
-mkModel = Model mkGame "this is Tictactoe" 
 
 -------------------------------------------------------------------------------
 -- update

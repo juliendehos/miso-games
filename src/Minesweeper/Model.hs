@@ -8,6 +8,17 @@ import System.Random.Stateful
 
 import Minesweeper.Game
 
+data Mode
+  = ModeBeginner
+  | ModeIntermediate
+  | ModeExpert
+
+mode2infos :: Mode -> (Int, Int, Int)
+mode2infos = \case
+  ModeBeginner      -> (9, 9, 10)
+  ModeIntermediate  -> (16, 16, 40)
+  ModeExpert        -> (16, 30, 99)
+
 data Model = Model
   { _mGame :: Game
   , _mGen :: StdGen
@@ -20,15 +31,4 @@ mkModel mode gen0 = uncurry Model <$> runStateGenT gen0 (mkGame $ mode2infos mod
 
 resetModel :: (PrimMonad m) => Mode -> Model -> m Model
 resetModel mode = mkModel mode . _mGen
-
-data Mode
-  = ModeBeginner
-  | ModeIntermediate
-  | ModeExpert
-
-mode2infos :: Mode -> (Int, Int, Int)
-mode2infos = \case
-  ModeBeginner      -> (9, 9, 10)
-  ModeIntermediate  -> (16, 16, 40)
-  ModeExpert        -> (16, 30, 99)
 
