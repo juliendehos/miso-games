@@ -5,10 +5,7 @@ module App.Component where
 
 import Miso
 
-import Control.Monad.Primitive
 import Miso.Lens
-import Miso.Lens.TH
-import System.Random.Stateful
 
 import App.Model
 import Minesweeper.Component as Minesweeper

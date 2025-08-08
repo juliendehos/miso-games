@@ -4,10 +4,7 @@ module App.Model where
 import Control.Monad.Primitive
 import Miso.Lens
 import Miso.Lens.TH
-import System.Random.Stateful
-
-import Minesweeper.Component as Minesweeper
-import Tictactoe.Component as Tictactoe
+import System.Random
 
 data GameType
   = Tictactoe

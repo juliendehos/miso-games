@@ -3,19 +3,14 @@
 
 module Minesweeper.Component (mkComponent) where
 
-import Control.Monad.ST
-import Miso
-import System.Random
-
-import Control.Monad.IO.Class (liftIO)
-import Miso
-import Miso.Lens
-
 import Control.Monad (when)
+import Control.Monad.IO.Class (liftIO)
+import Control.Monad.ST
 import Miso
 import Miso.Canvas as Canvas
 import Miso.Lens
 import Miso.Style qualified as Style
+import System.Random
 
 import Helpers.Canvas
 import Minesweeper.Game
@@ -92,7 +87,7 @@ updateModel (ActionAskPlay event) = do
 cellSizeD :: Double
 cellSizeD = fromIntegral cellSize
 
-cs007, cs01, cs02, cs03, cs04, cs05, cs06, cs07, cs08, cs09 :: Double
+cs007, cs01, cs02, cs03, cs04, cs05, cs06, cs08, cs09 :: Double
 cs007 = cellSizeD * 0.07
 cs01 = cellSizeD * 0.1
 cs02 = cellSizeD * 0.2
@@ -100,7 +95,6 @@ cs03 = cellSizeD * 0.3
 cs04 = cellSizeD * 0.4
 cs05 = cellSizeD * 0.5
 cs06 = cellSizeD * 0.6
-cs07 = cellSizeD * 0.7
 cs08 = cellSizeD * 0.8
 cs09 = cellSizeD * 0.9
 
