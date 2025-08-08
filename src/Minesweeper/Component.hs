@@ -11,7 +11,6 @@ import Minesweeper.View
 
 mkComponent :: StdGen -> Component m Model Action
 mkComponent gen = do
-  -- let gen = mkStdGen 42
   let initialModel = runST $ mkModel ModeBeginner gen
   (component initialModel updateModel viewModel)
     { events = defaultEvents <> pointerEvents

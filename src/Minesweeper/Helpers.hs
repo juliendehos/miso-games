@@ -42,4 +42,3 @@ ij2xy' = ij2xyTL cellSize cellSize
 xy2ij' :: Double -> Double -> (Int, Int)
 xy2ij' = xy2ij cellSize cellSize
 
-

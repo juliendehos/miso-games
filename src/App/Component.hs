@@ -48,6 +48,8 @@ updateModel (ActionAskGame gt) = do
     "Minesweeper" -> do
       mGameType .= Minesweeper
       io_ $ consoleLog "minesweeper"
+    _ -> do
+      io_ $ consoleLog "unknown game"
 
 -------------------------------------------------------------------------------
 -- View
@@ -74,7 +76,7 @@ viewModel Model{..} =
 
   where
     gameDiv = case _mGameType of
-      Tictactoe   -> 
+      Tictactoe -> 
         div_ []
           [ h2_ [] [ "Tictactoe" ]
           , div_ [] +> Tictactoe.mkComponent
