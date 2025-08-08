@@ -24,7 +24,7 @@ updateModel () = pure ()
 viewModel :: Model -> View parent Action
 viewModel _model =
   div_ []
-    [ h2_ [] [ "Breakthrough" ]
+    [ p_ [] [ "under construction..." ]
     ]
 
 -------------------------------------------------------------------------------

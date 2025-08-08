@@ -63,17 +63,17 @@ viewModel Model{..} =
       Breakthrough -> 
         div_ []
           [ h2_ [] [ "Breakthrough" ]
-          , div_ [] +> Breakthrough.mkComponent
+          , div_ [ key_ ("breakthrough"::MisoString) ] +> Breakthrough.mkComponent
           ]
       Minesweeper -> 
         div_ []
           [ h2_ [] [ "Minesweeper" ]
-          , div_ [] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
+          , div_ [ key_ ("minesweeper"::MisoString) ] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
           ]
       Tictactoe -> 
         div_ []
           [ h2_ [] [ "Tictactoe" ]
-          , div_ [] +> Tictactoe.mkComponent
+          , div_ [ key_ ("tictactoe"::MisoString) ] +> Tictactoe.mkComponent
           ]
 
 -------------------------------------------------------------------------------
