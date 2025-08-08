@@ -1,7 +1,9 @@
+{-# LANGUAGE OverloadedStrings #-}
 
 module App.Model where
 
 import Control.Monad.Primitive
+import Miso
 import Miso.Lens
 import Miso.Lens.TH
 import System.Random

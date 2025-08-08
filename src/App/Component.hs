@@ -52,10 +52,6 @@ viewModel Model{..} =
         ]
     -- , p_ [] [ "player 2: TODO" ]
     , gameDiv
-    -- , h2_ [] [ "test tictactoe" ]
-    -- , div_ [] +> Tictactoe.mkComponent
-    -- , h2_ [] [ "test minesweeper" ]
-    -- , div_ [] +> Minesweeper.mkComponent _mGen
     ]
 
   where
@@ -63,17 +59,17 @@ viewModel Model{..} =
       Breakthrough -> 
         div_ []
           [ h2_ [] [ "Breakthrough" ]
-          , div_ [ key_ ("breakthrough"::MisoString) ] +> Breakthrough.mkComponent
+          , div_ [ key_ ("Breakthrough"::MisoString) ] +> Breakthrough.mkComponent
           ]
       Minesweeper -> 
         div_ []
           [ h2_ [] [ "Minesweeper" ]
-          , div_ [ key_ ("minesweeper"::MisoString) ] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
+          , div_ [ key_ ("Minesweeper"::MisoString) ] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
           ]
       Tictactoe -> 
         div_ []
           [ h2_ [] [ "Tictactoe" ]
-          , div_ [ key_ ("tictactoe"::MisoString) ] +> Tictactoe.mkComponent
+          , div_ [ key_ ("Tictactoe"::MisoString) ] +> Tictactoe.mkComponent
           ]
 
 -------------------------------------------------------------------------------

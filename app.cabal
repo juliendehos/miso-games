@@ -45,7 +45,7 @@ executable app
     Tictactoe.Model
   build-depends:
     base,
-    lens,
+    jsaddle,
     massiv,
     miso,
     mtl,

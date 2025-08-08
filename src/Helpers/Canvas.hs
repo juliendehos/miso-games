@@ -1,9 +1,18 @@
+{-# LANGUAGE OverloadedStrings #-}
 
 module Helpers.Canvas where
 
 import Control.Monad (forM_)
 import Miso.Canvas as Canvas
 import Miso.Style as Style
+
+import Language.Javascript.JSaddle
+
+-- https://codinhood.com/nano/dom/disable-context-menu-right-click-javascript/
+disableRightClick :: JSVal -> Canvas.Canvas ()
+disableRightClick v = liftJSM $ do
+  f <- eval ("e => false" :: JSString)
+  (v <# ("oncontextmenu"::JSString)) f
 
 drawBackground :: Color -> Double -> Double -> Canvas ()
 drawBackground c w h = do

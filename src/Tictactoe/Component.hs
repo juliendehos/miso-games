@@ -52,7 +52,7 @@ updateModel :: Action -> Effect parentModel Model Action
 
 updateModel (ActionAskPlay event) = do
   game <- use modelGame
-  when (isRunning game) $ do
+  when (isRunning game && button event == 0) $ do
     player <- getCurrentPlayer <$> use modelGame
     let (i, j) = uncurry xy2ij' $ offset event 
         iStr = ms $ show i

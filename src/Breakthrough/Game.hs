@@ -26,8 +26,12 @@ data Cell
   | CellRed
   | CellBlue
 
+type BreakthroughBoard = Board Cell
+
+makeLenses ''BreakthroughBoard
+
 data Game = Game
-  { _gameBoard  :: Board Cell
+  { _gameBoard  :: BreakthroughBoard
   , _gameStatus :: Status
   }
 

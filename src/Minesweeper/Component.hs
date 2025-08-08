@@ -75,7 +75,7 @@ updateModel (ActionAskPlay event) = do
     0 -> do
       io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
       mGame %= play (MoveFree i j)
-    1 -> do
+    2 -> do
       io_ (consoleLog ("playFlag " <> ms (show i) <> " " <> ms (show j)))
       mGame %= play (MoveFlag i j)
     _ -> pure ()
@@ -105,7 +105,7 @@ viewModel model = div_ []
       , button_ [ onClick (ActionAskReset ModeIntermediate) ] [ "intermediate" ]
       , button_ [ onClick (ActionAskReset ModeExpert) ]       [ "expert" ]
       ]
-  , p_ [] [ "left-click to discover, middle-click to flag/unflag" ]
+  , p_ [] [ "left-click to discover, right-click to flag/unflag" ]
   , Canvas.canvas 
       [ width_ (ms $ nj * cellSize)
       , height_ (ms $ ni * cellSize)
@@ -133,7 +133,7 @@ viewModel model = div_ []
       StatusLost      -> "lost"
 
 initCanvas :: DOMRef -> Canvas ()
-initCanvas _ = pure ()
+initCanvas = disableRightClick
 
 drawCanvas :: Model -> () -> Canvas ()
 drawCanvas model () = do
