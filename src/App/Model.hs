@@ -7,8 +7,9 @@ import Miso.Lens.TH
 import System.Random
 
 data GameType
-  = Tictactoe
+  = Breakthrough
   | Minesweeper
+  | Tictactoe
   deriving (Eq)
 
 data Model = Model
@@ -19,5 +20,5 @@ data Model = Model
 makeLenses ''Model
 
 mkModel :: (PrimMonad m) => StdGen -> m Model
-mkModel = pure . Model Tictactoe
+mkModel = pure . Model Minesweeper
 

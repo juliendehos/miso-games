@@ -8,6 +8,7 @@ import Miso
 import Miso.Lens
 
 import App.Model
+import Breakthrough.Component as Breakthrough
 import Minesweeper.Component as Minesweeper
 import Tictactoe.Component as Tictactoe
 
@@ -21,12 +22,15 @@ newtype Action
 updateModel :: Action -> Transition Model Action
 updateModel (ActionAskGame gt) = do
   case gt of
-    "Tictactoe" -> do
-      mGameType .= Tictactoe
-      io_ $ consoleLog "tictactoe"
+    "Breakthrough" -> do
+      mGameType .= Breakthrough
+      io_ $ consoleLog "Breakthrough"
     "Minesweeper" -> do
       mGameType .= Minesweeper
-      io_ $ consoleLog "minesweeper"
+      io_ $ consoleLog "Minesweeper"
+    "Tictactoe" -> do
+      mGameType .= Tictactoe
+      io_ $ consoleLog "Tictactoe"
     _ -> do
       io_ $ consoleLog "unknown game"
 
@@ -39,31 +43,37 @@ viewModel Model{..} =
   div_ [] 
     [ h1_ [] [ "miso-games" ]
     , p_ [] 
-        [ text "game: "
+        [ text "Game: "
         , select_ [ onChange ActionAskGame ]
-            [ option_ [] [ "Tictactoe" ]
-            , option_ [] [ "Minesweeper" ]
+            [ option_ [ selected_ (_mGameType == Breakthrough) ]  [ "Breakthrough" ]
+            , option_ [ selected_ (_mGameType == Minesweeper) ]   [ "Minesweeper" ]
+            , option_ [ selected_ (_mGameType == Tictactoe) ]     [ "Tictactoe" ]
             ]
         ]
     -- , p_ [] [ "player 2: TODO" ]
     , gameDiv
-    , h2_ [] [ "test tictactoe" ]
-    , div_ [] +> Tictactoe.mkComponent
-    , h2_ [] [ "test minesweeper" ]
-    , div_ [] +> Minesweeper.mkComponent _mGen
+    -- , h2_ [] [ "test tictactoe" ]
+    -- , div_ [] +> Tictactoe.mkComponent
+    -- , h2_ [] [ "test minesweeper" ]
+    -- , div_ [] +> Minesweeper.mkComponent _mGen
     ]
 
   where
     gameDiv = case _mGameType of
-      Tictactoe -> 
+      Breakthrough -> 
         div_ []
-          [ h2_ [] [ "Tictactoe" ]
-          , div_ [] +> Tictactoe.mkComponent
+          [ h2_ [] [ "Breakthrough" ]
+          , div_ [] +> Breakthrough.mkComponent
           ]
       Minesweeper -> 
         div_ []
           [ h2_ [] [ "Minesweeper" ]
           , div_ [] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
+          ]
+      Tictactoe -> 
+        div_ []
+          [ h2_ [] [ "Tictactoe" ]
+          , div_ [] +> Tictactoe.mkComponent
           ]
 
 -------------------------------------------------------------------------------

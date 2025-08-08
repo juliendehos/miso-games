@@ -33,6 +33,9 @@ executable app
     Helpers.Canvas
     App.Component
     App.Model
+    Breakthrough.Component
+    Breakthrough.Game
+    Breakthrough.Model
     Minesweeper.Component
     Minesweeper.Game
     Minesweeper.Model
