@@ -17,8 +17,7 @@ module Tictactoe.Game
   , isRunning
   ) where
 
-import Data.Vector as V hiding (filter)
--- import Helpers.Board
+import Helpers.Board
 
 -------------------------------------------------------------------------------
 -- types
@@ -43,8 +42,7 @@ data Cell
   | CellO
   deriving (Eq)
 
-type Board = Vector Cell
--- type Board = Board' Cell
+type Board = Board' Cell
 
 data Move = Move Int Int
   deriving (Eq)
@@ -63,18 +61,16 @@ data Game = Game
 -------------------------------------------------------------------------------
 
 play :: Move -> Game -> Maybe Game
-play m g@Game{..} =
-  -- if not (isRunning g) || getK _gameBoard k /= CellEmpty
-  if not (isRunning g) || _gameBoard ! k /= CellEmpty
+play m@(Move i j) g@Game{..} =
+  if not (isRunning g) || getIJ _gameBoard i j /= CellEmpty
     then Nothing
     else 
       Just $ Game b rm ms s _gameInitialPlayer np
   where
-    k = move2k m
     (c, np) = case _gameCurrentPlayer of
       PlayerX -> (CellX, PlayerO)
       PlayerO -> (CellO, PlayerX)
-    b = _gameBoard // [(k, c)]
+    b = setIJ _gameBoard i j c
     rm = _gameRemMoves - 1
     ms = filter (/=m) _gameMoves
     s = computeStatus m c b rm
@@ -82,7 +78,7 @@ play m g@Game{..} =
 mkGame :: Game
 mkGame = Game board 9 moves XPlays PlayerX PlayerX
   where
-    board = V.replicate 9 CellEmpty 
+    board = mkBoardFromVal 3 3 CellEmpty 
     moves = [ Move i j | i<-[0..2], j<-[0..2] ]
 
 reset :: Game -> Game
@@ -114,22 +110,11 @@ isRunning :: Game -> Bool
 isRunning Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
-forGame game f = V.iforM_ (_gameBoard game) $ \k c -> 
-    let (i, j) = k2ij k
-    in f i j c
+forGame Game{..} = forBoard _gameBoard
 
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
-
-move2k :: Move -> Int
-move2k (Move i j) = i*3 + j
-
-ij2k :: (Int, Int) -> Int
-ij2k (i, j) = i*3 + j
-
-k2ij :: Int -> (Int, Int)
-k2ij k = (div k 3, mod k 3)
 
 computeStatus :: Move -> Cell -> Board -> Int -> Status
 computeStatus (Move i j) c b rm =
@@ -140,9 +125,9 @@ computeStatus (Move i j) c b rm =
     (False, CellX, _) -> OPlays
     _                 -> XPlays
   where
-    f ij' = b ! ij2k ij' == c
-    win = f (i, 0) && f (i, 1) && f (i, 2) ||
-          f (0, j) && f (1, j) && f (2, j) ||
-          f (0, 0) && f (1, 1) && f (2, 2) ||
-          f (0, 2) && f (1, 1) && f (2, 0)
+    f i' j' = getIJ b i' j' == c
+    win = f i 0 && f i 1 && f i 2 ||
+          f 0 j && f 1 j && f 2 j ||
+          f 0 0 && f 1 1 && f 2 2 ||
+          f 0 2 && f 1 1 && f 2 0
 
