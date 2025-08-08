@@ -31,7 +31,7 @@ drawGrid c ni nj di dj w h = do
     let y = fromIntegral (i * di)
     moveTo (0, y)
     lineTo (w, y)
-  stroke ()
+  Canvas.stroke ()
 
 xy2ij :: Int -> Int -> Double -> Double -> (Int, Int)
 xy2ij di dj x y = (floor y `div` di, floor x `div` dj)
