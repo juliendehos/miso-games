@@ -77,8 +77,5 @@ viewModel Model{..} =
 -------------------------------------------------------------------------------
 
 mkComponent :: Model -> App Model Action
-mkComponent model = 
-  (component model updateModel viewModel) 
-    { events = defaultEvents <> pointerEvents
-    }
+mkComponent model = component model updateModel viewModel
 

@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 
 module Minesweeper.Game
   ( Cell(..)
@@ -10,6 +11,7 @@ module Minesweeper.Game
   , gNbMines
   , gRemCells
   , gStatus
+  , isRunning
   , mkGame
   , play
   ) where
@@ -76,8 +78,15 @@ forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame game f = A.iforM_ (game ^. gCells) $ \(Ix2 i j) c -> f i j c
 
 play :: Move -> Game -> Game
-play (MoveFlag i j) game = runST $ execStateT (playFlag i j) game
-play (MoveFree i j) game = runST $ execStateT (playFree i j) game
+play move game =
+  if isRunning game
+    then case move of
+      MoveFlag i j -> runST $ execStateT (playFlag i j) game
+      MoveFree i j -> runST $ execStateT (playFree i j) game
+    else game
+
+isRunning :: Game -> Bool
+isRunning Game{..} = _gStatus == StatusRunning
 
 -------------------------------------------------------------------------------
 -- internal
