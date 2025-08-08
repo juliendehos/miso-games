@@ -30,6 +30,7 @@ executable app
     Main.hs
   other-modules:
     Game
+    Helpers.Board
     Helpers.Canvas
     App.Component
     App.Model
@@ -44,6 +45,7 @@ executable app
     Tictactoe.Model
   build-depends:
     base,
+    lens,
     massiv,
     miso,
     mtl,

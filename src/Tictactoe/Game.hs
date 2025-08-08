@@ -19,16 +19,27 @@ module Tictactoe.Game
 
 import Data.Vector as V hiding (filter)
 
-import Game
-
 -------------------------------------------------------------------------------
 -- types
 -------------------------------------------------------------------------------
 
+data Status
+  = XPlays
+  | OPlays
+  | XWins
+  | OWins
+  | Draw
+  deriving (Eq)
+
+data Player
+  = PlayerX
+  | PlayerO
+  deriving (Eq)
+
 data Cell
   = CellEmpty
-  | CellPlayer1
-  | CellPlayer2
+  | CellX
+  | CellO
   deriving (Eq)
 
 type Board = Vector Cell
@@ -58,15 +69,15 @@ play m g@Game{..} =
   where
     k = move2k m
     (c, np) = case _gameCurrentPlayer of
-      Player1 -> (CellPlayer1, Player2)
-      Player2 -> (CellPlayer2, Player1)
+      PlayerX -> (CellX, PlayerO)
+      PlayerO -> (CellO, PlayerX)
     b = _gameBoard // [(k, c)]
     rm = _gameRemMoves - 1
     ms = filter (/=m) _gameMoves
     s = computeStatus m c b rm
 
 mkGame :: Game
-mkGame = Game board 9 moves Player1Plays Player1 Player1
+mkGame = Game board 9 moves XPlays PlayerX PlayerX
   where
     board = V.replicate 9 CellEmpty 
     moves = [ Move i j | i<-[0..2], j<-[0..2] ]
@@ -81,11 +92,11 @@ reset g0 =
   where
     (player, status) = 
       case _gameInitialPlayer g0 of
-        Player1 -> (Player2, Player2Plays)
-        Player2 -> (Player1, Player1Plays)
+        PlayerX -> (PlayerO, OPlays)
+        PlayerO -> (PlayerX, XPlays)
 
 getPlayers :: [Player]
-getPlayers = [Player1, Player2]
+getPlayers = [PlayerX, PlayerO]
 
 getMoves :: Game -> [Move]
 getMoves = _gameMoves
@@ -97,7 +108,7 @@ getCurrentPlayer :: Game -> Player
 getCurrentPlayer = _gameCurrentPlayer
 
 isRunning :: Game -> Bool
-isRunning Game{..} = _gameStatus == Player1Plays || _gameStatus == Player2Plays
+isRunning Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame game f = V.iforM_ (_gameBoard game) $ \k c -> 
@@ -120,11 +131,11 @@ k2ij k = (div k 3, mod k 3)
 computeStatus :: Move -> Cell -> Board -> Int -> Status
 computeStatus (Move i j) c b rm =
   case (win, c, rm) of
-    (True, CellPlayer1, _)  -> Player1Wins
-    (True, CellPlayer2, _)  -> Player2Wins
-    (False, _, 0)           -> Draw
-    (False, CellPlayer1, _) -> Player2Plays
-    _                       -> Player1Plays
+    (True, CellX, _)  -> XWins
+    (True, CellO, _)  -> OWins
+    (False, _, 0)     -> Draw
+    (False, CellX, _) -> OPlays
+    _                 -> XPlays
   where
     f ij' = b ! ij2k ij' == c
     win = f (i, 0) && f (i, 1) && f (i, 2) ||

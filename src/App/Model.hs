@@ -20,5 +20,5 @@ data Model = Model
 makeLenses ''Model
 
 mkModel :: (PrimMonad m) => StdGen -> m Model
-mkModel = pure . Model Minesweeper
+mkModel = pure . Model Breakthrough
 

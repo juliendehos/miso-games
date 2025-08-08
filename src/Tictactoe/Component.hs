@@ -58,8 +58,8 @@ updateModel (ActionAskPlay event) = do
         iStr = ms $ show i
         jStr = ms $ show j
         pStr = case player of
-          Player1 -> "X"
-          Player2 -> "O"
+          PlayerX -> "X"
+          PlayerO -> "O"
     case play (Move i j) game of
       Nothing -> modelLog .= pStr <> " failed to play " <> iStr <> " " <> jStr
       Just game' -> do
@@ -95,11 +95,11 @@ viewModel model@Model{..} =
     nbPossibleMoves = length $ getMoves _modelGame
 
     fmtStatus = \case
-      Player1Plays  -> "X plays"
-      Player2Plays  -> "O plays"
-      Player1Wins   -> "X wins"
-      Player2Wins   -> "O wins"
-      Draw          -> "it's a draw"
+      XPlays  -> "X plays"
+      OPlays  -> "O plays"
+      XWins   -> "X wins"
+      OWins   -> "O wins"
+      Draw    -> "it's a draw"
 
 initCanvas :: DOMRef -> Canvas ()
 initCanvas _ = pure ()
@@ -114,8 +114,8 @@ drawCanvas Model{..} () = do
 
 drawGameCell :: Style.Color -> Int -> Int -> Cell -> Canvas ()
 drawGameCell bg i j = \case
-  CellPlayer1 -> drawX i j
-  CellPlayer2 -> drawO bg i j
+  CellX -> drawX i j
+  CellO -> drawO bg i j
   _ -> pure ()
 
 
