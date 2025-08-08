@@ -1,5 +1,9 @@
 # :ramen: miso-games
 
+## TODO
+
+- remember the game states (using the (<-->) combinator)
+
 ## Solo games
 
 - [x] [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper)

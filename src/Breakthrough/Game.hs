@@ -26,12 +26,12 @@ data Cell
   | CellRed
   | CellBlue
 
-type BreakthroughBoard = Board Cell
+type Board = Board' Cell
 
-makeLenses ''BreakthroughBoard
+makeLenses ''Board
 
 data Game = Game
-  { _gameBoard  :: BreakthroughBoard
+  { _gameBoard  :: Board
   , _gameStatus :: Status
   }
 
@@ -40,5 +40,5 @@ makeLenses ''Game
 mkGame :: Game
 mkGame = Game board RedPlays
   where
-    board = mkBoard 8 8 (replicate 64 CellEmpty)
+    board = mkBoardFromList 8 8 (replicate 64 CellEmpty)
 

@@ -36,6 +36,7 @@ mkComponent = do
   let initialModel = mkModel
   (component initialModel updateModel viewModel)
     { events = defaultEvents <> pointerEvents
+    -- , logLevel = DebugAll
     }
 
 

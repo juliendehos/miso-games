@@ -18,6 +18,7 @@ module Tictactoe.Game
   ) where
 
 import Data.Vector as V hiding (filter)
+-- import Helpers.Board
 
 -------------------------------------------------------------------------------
 -- types
@@ -43,6 +44,7 @@ data Cell
   deriving (Eq)
 
 type Board = Vector Cell
+-- type Board = Board' Cell
 
 data Move = Move Int Int
   deriving (Eq)
@@ -62,6 +64,7 @@ data Game = Game
 
 play :: Move -> Game -> Maybe Game
 play m g@Game{..} =
+  -- if not (isRunning g) || getK _gameBoard k /= CellEmpty
   if not (isRunning g) || _gameBoard ! k /= CellEmpty
     then Nothing
     else 

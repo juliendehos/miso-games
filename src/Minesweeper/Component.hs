@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+-- {-# LANGUAGE RecordWildCards #-}
 
 module Minesweeper.Component (mkComponent) where
 
@@ -59,6 +59,7 @@ data Action
   = ActionAskReset Mode
   | ActionAskPlay PointerEvent
   | ActionSetModel Model
+  | ActionNone
 
 updateModel :: Action -> Effect parentModel Model Action
 
@@ -70,15 +71,19 @@ updateModel (ActionSetModel model) =
   put model
 
 updateModel (ActionAskPlay event) = do
-  let (i, j) = uncurry xy2ij' $ offset event 
-  case button event of
-    0 -> do
-      io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
-      mGame %= play (MoveFree i j)
-    2 -> do
-      io_ (consoleLog ("playFlag " <> ms (show i) <> " " <> ms (show j)))
-      mGame %= play (MoveFlag i j)
-    _ -> pure ()
+  running <- isRunning <$> use mGame
+  when running $ do
+    let (i, j) = uncurry xy2ij' $ offset event 
+    case button event of
+      0 -> do
+        io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
+        mGame %= play (MoveFree i j)
+      2 -> do
+        io_ (consoleLog ("playFlag " <> ms (show i) <> " " <> ms (show j)))
+        mGame %= play (MoveFlag i j)
+      _ -> pure ()
+
+updateModel ActionNone = pure ()
 
 -------------------------------------------------------------------------------
 -- view
@@ -111,6 +116,7 @@ viewModel model = div_ []
       , height_ (ms $ ni * cellSize)
       , Style.style_  [Style.border "2px solid black"]
       , onPointerUp ActionAskPlay
+      , onContextMenuWithOptions ActionNone (defaultOptions { preventDefault = True })
       ]
     initCanvas
     (drawCanvas model)
@@ -132,8 +138,12 @@ viewModel model = div_ []
       StatusWon       -> "won"
       StatusLost      -> "lost"
 
+    -- rightClick = onWithOptions (defaultOptions { preventDefault = True }) "contextmenu" emptyDecoder $ \() -> ActionNone
+
+
 initCanvas :: DOMRef -> Canvas ()
-initCanvas = disableRightClick
+initCanvas _ = pure ()
+-- initCanvas = disableRightClick
 
 drawCanvas :: Model -> () -> Canvas ()
 drawCanvas model () = do
@@ -229,6 +239,8 @@ mkComponent :: StdGen -> Component m Model Action
 mkComponent gen = do
   let initialModel = runST $ mkModel ModeBeginner gen
   (component initialModel updateModel viewModel)
+    -- { events = defaultEvents <> M.insert "contextmenu" False pointerEvents
     { events = defaultEvents <> pointerEvents
+    -- , logLevel = DebugAll
     }
 
