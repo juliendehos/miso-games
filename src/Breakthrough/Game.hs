@@ -139,7 +139,23 @@ computeGame ni nj p = Game board RedPlays moves p p
     moves = computeMoves board p
 
 computeMoves :: Board -> Player -> [Move]
-computeMoves b p = []   -- TODO
+computeMoves b = \case
+  PlayerRed -> go CellRed CellBlue (-1)
+  PlayerBlue -> go CellBlue CellRed 1
+  where
+    ni = b^.boardNi
+    nj = b^.boardNj
+    go cell1 cell2 deltaI =
+      [ Move (i0, j0) (i1, j1) 
+      | i0<-[0 .. ni-1]
+      , let i1 = i0 + deltaI
+      , j0<-[0 .. nj-1]
+      , j1<-[j0-1 .. j0+1]
+      , i1>=0 && i1<ni && j1>=0 && j1<nj      -- ij1 is inside the board
+      , getIJ i0 j0 b == cell1                -- ij0 is a current player's cell
+      , let c1 = getIJ i1 j1 b
+      , c1==cell2 && j1/=j0 || c1==CellEmpty  -- move to an empty cell or capture (diagonaly) an opponent's cell
+      ]
 
 player2cell :: Player -> Cell
 player2cell = \case
