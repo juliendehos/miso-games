@@ -35,7 +35,7 @@ data Status
   = StatusRunning
   | StatusWon
   | StatusLost
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Cell
   = CellUnknown
@@ -44,11 +44,12 @@ data Cell
   | CellFlagKo
   | CellMine
   | CellMineKo
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Move
   = MoveFree Int Int
   | MoveFlag Int Int
+  deriving (Eq, Show)
 
 data Game = Game
   { _gameMines       :: Array U Ix2 Bool

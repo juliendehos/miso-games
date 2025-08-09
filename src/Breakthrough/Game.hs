@@ -1,16 +1,20 @@
-{-# LANGUAGE RecordWildCards #-}
 
 module Breakthrough.Game 
   ( Game
   , Move(..)
   , Status(..)
+  , getCurrentPlayer
+  , getMoves
+  , getMovesFrom
+  , getMovesTo
   , getStatus
   , isRunning
   , mkGame
   , play
+  , reset
   ) where
 
-import Miso
+import Data.List (nub)
 import Miso.Lens
 import Miso.Lens.TH
 
@@ -23,7 +27,7 @@ import Helpers.Board
 data Move = Move
   { _moveFrom :: (Int, Int)
   , _moveTo   :: (Int, Int)
-  } deriving (Eq)
+  } deriving (Eq, Show)
 
 makeLenses ''Move
 
@@ -32,22 +36,29 @@ data Status
   | BluePlays
   | RedWins
   | BlueWins
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Cell
   = CellEmpty
   | CellRed
   | CellBlue
-  deriving (Eq)
+  deriving (Eq, Show)
+
+data Player
+  = PlayerRed
+  | PlayerBlue
+  deriving (Eq, Show)
 
 type Board = Board' Cell
 
 makeLenses ''Board
 
 data Game = Game
-  { _gameBoard  :: Board
-  , _gameStatus :: Status
-  , _gameMoves  :: [Move]   -- possible moves
+  { _gameBoard          :: Board
+  , _gameStatus         :: Status
+  , _gameMoves          :: [Move]   -- possible moves
+  , _gameInitialPlayer  :: Player
+  , _gameCurrentPlayer  :: Player
   } deriving (Eq)
 
 makeLenses ''Game
@@ -57,27 +68,87 @@ makeLenses ''Game
 -------------------------------------------------------------------------------
 
 mkGame :: Int -> Int -> Game
-mkGame ni nj = Game board RedPlays moves
-  where
-    board = mkBoardFromList ni nj $
-      replicate (2*nj) CellBlue <>
-      replicate ((ni-4)*nj) CellEmpty <>
-      replicate (2*nj) CellRed
-    moves = computeMoves board
+mkGame ni nj = computeGame ni nj PlayerRed
+
+reset :: Game -> Game
+reset g = 
+  computeGame 
+    (g^.gameBoard^.boardNi)
+    (g^.gameBoard^.boardNj) 
+    (if g ^. gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
 
 isRunning :: Game -> Bool
-isRunning Game{..} = _gameStatus == RedPlays || _gameStatus == BluePlays
+isRunning g = g^.gameStatus == RedPlays || g^.gameStatus == BluePlays
 
-play :: Move -> Game -> Game
-play m g = g    -- TODO
+play :: Move -> Game -> Maybe Game
+play m g =
+  if m `elem` g^.gameMoves
+    then
+      let
+        -- apply move
+        cell = g^.gameCurrentPlayer & player2cell
+        board' = g^.gameBoard & setIJs [(m^.moveFrom, CellRed), (m^.moveTo, cell)] 
+        -- update status and current player
+        (status', player') =
+          case (isWinning m g, g^.gameCurrentPlayer) of
+            (True, PlayerRed)   -> (RedWins, PlayerRed)
+            (True, PlayerBlue)  -> (BlueWins, PlayerBlue)
+            (False, PlayerRed)  -> (BluePlays, PlayerBlue)
+            (False, PlayerBlue) -> (RedPlays, PlayerRed)
+        -- update moves
+        moves' = computeMoves board' player'
+      in Just $ Game board' status' moves' (g^.gameInitialPlayer) player'
+    else Nothing
 
 getStatus :: Game -> Status
 getStatus = _gameStatus
+
+getMoves :: Game -> [Move]
+getMoves = _gameMoves
+
+getCurrentPlayer :: Game -> Player
+getCurrentPlayer = _gameCurrentPlayer
+
+getMovesFrom :: Game -> [(Int, Int)]
+getMovesFrom g =
+  g^.gameMoves 
+    & map _moveFrom 
+    & nub
+
+getMovesTo :: (Int, Int) -> Game -> [(Int, Int)]
+getMovesTo from g =
+  g^.gameMoves 
+    & filter ((==from) . _moveFrom)
+    & map _moveTo
 
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
 
-computeMoves :: Board -> [Move]
-computeMoves b = []   -- TODO
+mkBoard :: Int -> Int -> Board
+mkBoard ni nj =
+  mkBoardFromList ni nj $
+    replicate (2*nj) CellBlue <>
+    replicate ((ni-4)*nj) CellEmpty <>
+    replicate (2*nj) CellRed
+
+computeGame :: Int -> Int -> Player -> Game
+computeGame ni nj p = Game board RedPlays moves p p
+  where
+    board = mkBoard ni nj
+    moves = computeMoves board p
+
+computeMoves :: Board -> Player -> [Move]
+computeMoves b p = []   -- TODO
+
+player2cell :: Player -> Cell
+player2cell = \case
+  PlayerRed -> CellRed
+  PlayerBlue -> CellBlue
+
+isWinning :: Move -> Game -> Bool
+isWinning m g =
+  case g ^. gameCurrentPlayer of
+    PlayerRed -> (m^.moveTo & snd) == 0
+    PlayerBlue -> (m^.moveTo & snd) == (g^.gameBoard^.boardNj - 1)
 

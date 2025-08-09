@@ -1,10 +1,15 @@
 
-.PHONY= update build optim
+.PHONY= update build optim spec
 
-all: clean update build optim
+all: clean update spec build optim
 
 update:
 	wasm32-wasi-cabal update
+
+spec:
+	wasm32-wasi-cabal build spec
+	$(eval my_spec=$(shell wasm32-wasi-cabal list-bin spec | tail -n 1))
+	wasmi_cli $(my_spec)
 
 build:
 	wasm32-wasi-cabal build 

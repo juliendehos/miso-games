@@ -3,6 +3,7 @@
 ## TODO
 
 - remember the game states (using the (<-->) combinator)
+- add unit tests (for games)?
 
 ## Solo games
 

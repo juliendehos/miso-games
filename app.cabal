@@ -56,4 +56,27 @@ executable app
     GHC2024
   default-extensions:
     CPP TemplateHaskell
+
+test-suite spec
+  main-is:
+    Spec.hs
+  hs-source-dirs:
+    src
+  type:
+    exitcode-stdio-1.0
+  build-depends:
+    base,
+    hspec,
+    miso,
+    QuickCheck,
+    vector
+  other-modules:
+    Helpers.Board
+    Helpers.BoardSpec
+    Tictactoe.Game
+    Tictactoe.GameSpec
+  default-language:
+    GHC2024
+  default-extensions:
+    CPP TemplateHaskell
  

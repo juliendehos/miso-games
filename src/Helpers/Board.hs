@@ -40,22 +40,22 @@ mkBoardFromList ni nj = Board' ni nj . fromList
 mkBoardFromVal :: Int -> Int -> a -> Board' a
 mkBoardFromVal ni nj v = Board' ni nj (V.replicate (ni*nj) v)
 
-getK :: Board' a -> Int -> a
-getK Board'{..} k = _boardData ! k
+getK :: Int -> Board' a -> a
+getK k b = (b^.boardData) ! k
 
-getIJ :: Board' a -> Int -> Int -> a
-getIJ b@Board'{..} i j = _boardData ! ij2k b i j
+getIJ :: Int -> Int -> Board' a -> a
+getIJ i j b = (b^.boardData) ! ij2k b i j
 
-setK :: Board' a -> Int -> a -> Board' a
-setK b k v = b & boardData %~ (// [(k, v)])
+setK :: Int -> a -> Board' a -> Board' a
+setK k v b = b & boardData %~ (// [(k, v)])
 
-setIJ :: Board' a -> Int -> Int -> a -> Board' a
-setIJ b i j = setK b (ij2k b i j)
+setIJ :: Int -> Int -> a -> Board' a -> Board' a
+setIJ i j v b = setK (ij2k b i j) v b
 
-setIJs :: Board' a -> [(Int, Int, a)] -> Board' a
-setIJs b ijvs = b & boardData %~ (// kvs)
+setIJs :: [((Int, Int), a)] -> Board' a -> Board' a
+setIJs ijvs b = b & boardData %~ (// kvs)
   where
-    kvs = P.map (\(i, j, v) -> (ij2k b i j, v)) ijvs
+    kvs = P.map (\((i, j), v) -> (ij2k b i j, v)) ijvs
 
 forBoard :: (Monad m) => Board' a -> (Int -> Int -> a -> m ()) -> m ()
 forBoard b@Board'{..} f = V.iforM_ _boardData $ \k c -> 

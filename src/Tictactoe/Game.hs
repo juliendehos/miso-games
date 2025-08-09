@@ -29,23 +29,23 @@ data Status
   | XWins
   | OWins
   | Draw
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Player
   = PlayerX
   | PlayerO
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Cell
   = CellEmpty
   | CellX
   | CellO
-  deriving (Eq)
+  deriving (Eq, Show)
 
 type Board = Board' Cell
 
 data Move = Move Int Int
-  deriving (Eq)
+  deriving (Eq, Show)
 
 data Game = Game
   { _gameBoard          :: Board
@@ -62,7 +62,7 @@ data Game = Game
 
 play :: Move -> Game -> Maybe Game
 play m@(Move i j) g@Game{..} =
-  if not (isRunning g) || getIJ _gameBoard i j /= CellEmpty
+  if not (isRunning g) || getIJ i j _gameBoard /= CellEmpty
     then Nothing
     else 
       Just $ Game b rm ms s _gameInitialPlayer np
@@ -70,7 +70,7 @@ play m@(Move i j) g@Game{..} =
     (c, np) = case _gameCurrentPlayer of
       PlayerX -> (CellX, PlayerO)
       PlayerO -> (CellO, PlayerX)
-    b = setIJ _gameBoard i j c
+    b = setIJ i j c _gameBoard 
     rm = _gameRemMoves - 1
     ms = filter (/=m) _gameMoves
     s = computeStatus m c b rm
@@ -125,7 +125,7 @@ computeStatus (Move i j) c b rm =
     (False, CellX, _) -> OPlays
     _                 -> XPlays
   where
-    f i' j' = getIJ b i' j' == c
+    f i' j' = getIJ i' j' b == c
     win = f i 0 && f i 1 && f i 2 ||
           f 0 j && f 1 j && f 2 j ||
           f 0 0 && f 1 1 && f 2 2 ||
