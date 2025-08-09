@@ -67,12 +67,19 @@ test-suite spec
   build-depends:
     base,
     hspec,
+    massiv,
     miso,
+    mtl,
     QuickCheck,
+    random,
     vector
   other-modules:
     Helpers.Board
     Helpers.BoardSpec
+    Breakthrough.Game
+    Breakthrough.GameSpec
+    Minesweeper.Game
+    Minesweeper.GameSpec
     Tictactoe.Game
     Tictactoe.GameSpec
   default-language:

@@ -12,3 +12,5 @@ spec = do
     let b = mkBoardFromList 2 3 [1 .. 6::Int]
     it "getIJ" $ getIJ 1 0 b `shouldBe` 4
 
+-- TODO
+
