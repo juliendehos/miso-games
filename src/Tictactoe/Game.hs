@@ -1,20 +1,20 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Tictactoe.Game
-  ( Game
-  , Status(..)
-  , Player(..)
-  , Cell(..)
+  ( Cell(..)
+  , Game
   , Move(..)
-  , mkGame
-  , reset
-  , play
+  , Player(..)
+  , Status(..)
+  , forGame
   , getPlayers
   , getMoves
   , getStatus
   , getCurrentPlayer
-  , forGame
   , isRunning
+  , mkGame
+  , play
+  , reset
   ) where
 
 import Helpers.Board

@@ -20,8 +20,8 @@ mode2infos = \case
   ModeExpert        -> (16, 30, 99)
 
 data Model = Model
-  { _mGame :: Game
-  , _mGen :: StdGen
+  { _modelGame :: Game
+  , _modelGen :: StdGen
   } deriving (Eq)
 
 makeLenses ''Model
@@ -30,5 +30,5 @@ mkModel :: (PrimMonad m) => Mode -> StdGen -> m Model
 mkModel mode gen0 = uncurry Model <$> runStateGenT gen0 (mkGame $ mode2infos mode)
 
 resetModel :: (PrimMonad m) => Mode -> Model -> m Model
-resetModel mode = mkModel mode . _mGen
+resetModel mode = mkModel mode . _modelGen
 

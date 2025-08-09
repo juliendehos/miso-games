@@ -41,8 +41,7 @@ updateModel (ActionAskGame gt) = do
 viewModel :: Model -> View Model Action
 viewModel Model{..} = 
   div_ [] 
-    [ h1_ [] [ "miso-games" ]
-    , p_ [] 
+    [ p_ [] 
         [ text "Game: "
         , select_ [ onChange ActionAskGame ]
             [ option_ [ selected_ (_mGameType == Breakthrough) ]  [ "Breakthrough" ]

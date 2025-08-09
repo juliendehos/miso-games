@@ -4,6 +4,7 @@ module Helpers.Board where
 
 import Miso.Lens
 
+import Prelude as P
 import Data.Vector as V
 
 -------------------------------------------------------------------------------
@@ -50,6 +51,11 @@ setK b k v = b & boardData %~ (// [(k, v)])
 
 setIJ :: Board' a -> Int -> Int -> a -> Board' a
 setIJ b i j = setK b (ij2k b i j)
+
+setIJs :: Board' a -> [(Int, Int, a)] -> Board' a
+setIJs b ijvs = b & boardData %~ (// kvs)
+  where
+    kvs = P.map (\(i, j, v) -> (ij2k b i j, v)) ijvs
 
 forBoard :: (Monad m) => Board' a -> (Int -> Int -> a -> m ()) -> m ()
 forBoard b@Board'{..} f = V.iforM_ _boardData $ \k c -> 

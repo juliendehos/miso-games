@@ -71,16 +71,16 @@ updateModel (ActionSetModel model) =
   put model
 
 updateModel (ActionAskPlay event) = do
-  running <- isRunning <$> use mGame
+  running <- isRunning <$> use modelGame
   when running $ do
     let (i, j) = uncurry xy2ij' $ offset event 
     case button event of
       0 -> do
         io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
-        mGame %= play (MoveFree i j)
+        modelGame %= play (MoveFree i j)
       2 -> do
         io_ (consoleLog ("playFlag " <> ms (show i) <> " " <> ms (show j)))
-        mGame %= play (MoveFlag i j)
+        modelGame %= play (MoveFlag i j)
       _ -> pure ()
 
 updateModel ActionNone = pure ()
@@ -121,17 +121,17 @@ viewModel model = div_ []
     initCanvas
     (drawCanvas model)
   , p_ [] 
-        [ text ("status: " <> fmtStatus (model ^. mGame ^. gStatus))
+        [ text ("status: " <> fmtStatus (model ^. modelGame & getStatus))
         , br_ []
-        , text ("flags: " <> ms (show $ model ^. mGame ^. gFlags))
+        , text ("flags: " <> ms (show $ model ^. modelGame & getFlags))
         , br_ []
-        , text ("mines: " <> ms (show $ model ^. mGame ^. gNbMines))
+        , text ("mines: " <> ms (show $ model ^. modelGame & getNbMines))
         , br_ []
-        , text ("remaining cells: " <> ms (show $ model ^. mGame ^. gRemCells))
+        , text ("remaining cells: " <> ms (show $ model ^. modelGame & getRemCells))
         ]
   ]
   where
-    (ni, nj) = model ^. mGame ^. gBoardNiNj
+    (ni, nj) = model ^. modelGame & getBoardNiNj
 
     fmtStatus = \case
       StatusRunning   -> "running"
@@ -147,13 +147,13 @@ initCanvas _ = pure ()
 
 drawCanvas :: Model -> () -> Canvas ()
 drawCanvas model () = do
-  let (ni, nj) = model ^. mGame ^. gBoardNiNj
+  let (ni, nj) = model ^. modelGame & getBoardNiNj
       w = fromIntegral $ nj * cellSize
       h = fromIntegral $ ni * cellSize
   clearRect (0, 0, w, h)
   font cellFont
   drawBackground colorNo w h
-  forGame (model ^. mGame) drawGameCell
+  forGame (model ^. modelGame) drawGameCell
   drawGrid Style.black ni nj cellSize cellSize w h
 
 drawCell :: Style.Color -> Canvas ()

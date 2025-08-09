@@ -1,16 +1,18 @@
 {-# LANGUAGE RecordWildCards #-}
 
+{-# OPTIONS -Wno-unused-top-binds #-}
+
 module Minesweeper.Game
   ( Cell(..)
   , Game
   , Move(..)
   , Status(..)
   , forGame
-  , gBoardNiNj
-  , gFlags
-  , gNbMines
-  , gRemCells
-  , gStatus
+  , getBoardNiNj
+  , getFlags
+  , getNbMines
+  , getRemCells
+  , getStatus
   , isRunning
   , mkGame
   , play
@@ -49,14 +51,14 @@ data Move
   | MoveFlag Int Int
 
 data Game = Game
-  { _gMines       :: Array U Ix2 Bool
-  , _gNeighbors   :: Array P Ix2 Int
-  , _gCells       :: Array B Ix2 Cell
-  , _gStatus      :: Status
-  , _gFlags       :: Int
-  , _gRemCells    :: Int
-  , _gBoardNiNj   :: (Int, Int)
-  , _gNbMines     :: Int
+  { _gameMines       :: Array U Ix2 Bool
+  , _gameNeighbors   :: Array P Ix2 Int
+  , _gameCells       :: Array B Ix2 Cell
+  , _gameStatus      :: Status
+  , _gameFlags       :: Int
+  , _gameRemCells    :: Int
+  , _gameBoardNiNj   :: (Int, Int)
+  , _gameNbMines     :: Int
   } deriving (Eq)
 
 makeLenses ''Game
@@ -75,7 +77,7 @@ mkGame (ni, nj, nbMines) gen = do
   pure game
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
-forGame game f = A.iforM_ (game ^. gCells) $ \(Ix2 i j) c -> f i j c
+forGame game f = A.iforM_ (game ^. gameCells) $ \(Ix2 i j) c -> f i j c
 
 play :: Move -> Game -> Game
 play move game =
@@ -86,7 +88,22 @@ play move game =
     else game
 
 isRunning :: Game -> Bool
-isRunning Game{..} = _gStatus == StatusRunning
+isRunning Game{..} = _gameStatus == StatusRunning
+
+getStatus :: Game -> Status
+getStatus = _gameStatus
+
+getBoardNiNj :: Game -> (Int, Int)
+getBoardNiNj = _gameBoardNiNj
+
+getFlags :: Game -> Int
+getFlags = _gameFlags
+
+getNbMines :: Game -> Int
+getNbMines = _gameNbMines
+
+getRemCells :: Game -> Int
+getRemCells = _gameRemCells
 
 -------------------------------------------------------------------------------
 -- internal
@@ -120,26 +137,26 @@ computeNeighbors mines =
 playFlag :: (MonadState Game m, PrimMonad m) => Int -> Int -> m ()
 playFlag i j = do
   let ij = Ix2 i j
-  cells <- thawS @B @Ix2 @Cell =<< use gCells
+  cells <- thawS @B @Ix2 @Cell =<< use gameCells
   c <- A.read cells ij
   case c of
     Just CellUnknown -> do
       write_ cells ij CellFlag
-      gFlags += 1
+      gameFlags += 1
     Just CellFlag -> do
       write_ cells ij CellUnknown
-      gFlags -= 1
+      gameFlags -= 1
     _ -> pure ()
-  freezeS cells >>= assign gCells
+  freezeS cells >>= assign gameCells
 
 playFree :: (MonadState Game m, PrimMonad m) => Int -> Int -> m ()
 playFree i j = do
-  status <- use gStatus
+  status <- use gameStatus
   when (status == StatusRunning) $ do
     let ij = Ix2 i j
-    c <- (`index` ij) <$> use gCells 
+    c <- (`index` ij) <$> use gameCells 
     when (c /= Just CellFlag) $ do
-      m <- (`index` ij) <$> use gMines 
+      m <- (`index` ij) <$> use gameMines 
       case m of
         Just True -> playFreeKo ij
         Just False ->  playFreeOk ij
@@ -148,14 +165,14 @@ playFree i j = do
 playFreeKo :: (MonadState Game m, PrimMonad m) => Ix2 -> m ()
 playFreeKo ij = do
   -- update cells
-  cells <- thawS @B @Ix2 @Cell =<< use gCells
+  cells <- thawS @B @Ix2 @Cell =<< use gameCells
   write_ cells ij CellMineKo
-  freezeS cells >>= assign gCells
+  freezeS cells >>= assign gameCells
   -- show mines and flags in cells
-  mines <- use gMines
-  gCells %= compute . A.zipWith upCell mines
+  mines <- use gameMines
+  gameCells %= compute . A.zipWith upCell mines
   -- update status
-  gStatus .= StatusLost
+  gameStatus .= StatusLost
   where
     upCell False CellFlag = CellFlagKo
     upCell True CellUnknown = CellMine
@@ -166,19 +183,19 @@ playFreeOk ij = do
   -- update cells
   discoverCells ij
   -- check win
-  rc <- use gRemCells
+  rc <- use gameRemCells
   when (rc == 0) $ do
     -- show flags in cells
-    gCells %= compute . A.map (\c -> if c == CellUnknown then CellFlag else c)
+    gameCells %= compute . A.map (\c -> if c == CellUnknown then CellFlag else c)
     -- update status
-    gStatus .= StatusWon
+    gameStatus .= StatusWon
 
 -- assumes ij0 is a free cell (no mine)
 discoverCells :: (MonadState Game m, PrimMonad m) => Ix2 -> m ()
 discoverCells ij0' = do
-  cells <- thawS @B @Ix2 @Cell =<< use gCells
-  (ni, nj) <- use gBoardNiNj
-  neighbors <- use gNeighbors
+  cells <- thawS @B @Ix2 @Cell =<< use gameCells
+  (ni, nj) <- use gameBoardNiNj
+  neighbors <- use gameNeighbors
 
   let
     discover [] = pure ()
@@ -193,7 +210,7 @@ discoverCells ij0' = do
               -- unknown cell -> discover
               let n = neighbors ! ij0
               write_ cells ij0 (CellFree n)
-              gRemCells -= 1
+              gameRemCells -= 1
               if n > 0
                 then discover ijs
                 else do
@@ -208,5 +225,5 @@ discoverCells ij0' = do
 
   discover [ij0']
 
-  freezeS cells >>= assign gCells
+  freezeS cells >>= assign gameCells
 
