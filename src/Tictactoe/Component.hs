@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module Tictactoe.Component (mkComponent) where
 
@@ -15,7 +14,7 @@ import Tictactoe.Game
 import Tictactoe.Model
 
 -------------------------------------------------------------------------------
--- params and helpers
+-- view params
 -------------------------------------------------------------------------------
 
 bgColor, bgColorEnd, fgColor :: Style.Color
@@ -29,17 +28,15 @@ cellSize = 100
 cellSizeD :: Double
 cellSizeD = fromIntegral cellSize
 
+-------------------------------------------------------------------------------
+-- helpers
+-------------------------------------------------------------------------------
+
 xy2ij :: Double -> Double -> (Int, Int)
 xy2ij = xy2ij' cellSize cellSize
 
 ij2xyC :: Int -> Int -> (Double, Double)
 ij2xyC = ij2xyC' cellSize cellSize
-
-computeCanvasSize :: Model -> Int -> Int -> (Int, Int)
-computeCanvasSize model cellWidth cellHeight =
-  (nj*cellWidth, ni*cellHeight)
-  where
-    (ni, nj) = model^.modelGame & getNiNj
 
 -------------------------------------------------------------------------------
 -- action
@@ -80,28 +77,28 @@ updateModel ActionNewGame = do
 -------------------------------------------------------------------------------
 
 viewModel :: Model -> View parent Action
-viewModel model@Model{..} =
+viewModel model =
   div_ [] 
     [ p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
     , canvas 
-        [ width_ (ms $ show canvasWidth)
-        , height_ (ms $ show canvasHeight)
+        [ width_ (ms $ show canvasWidthD)
+        , height_ (ms $ show canvasHeightD)
         , Style.style_  [Style.border "2px solid black"]
         , onPointerUp ActionAskPlay
         ]
       initCanvas
-      (drawCanvas canvasWidthD canvasHeightD model)
-    , p_ [] [ text ("status: " <> fmtStatus (getStatus _modelGame)) ]
-    , p_ [] [ text ("log: " <> _modelLog) ]
+      (drawCanvas ni nj canvasWidthD canvasHeightD model)
+    , p_ [] [ text ("status: " <> (model^.modelGame & getStatus & fmtStatus)) ]
+    , p_ [] [ text ("log: " <> model^.modelLog) ]
     , p_ [] [ text ("nb possible moves: " <> ms (show nbPossibleMoves)) ]
     ]
 
   where
-    (canvasWidth, canvasHeight) = computeCanvasSize model cellSize cellSize
-    canvasWidthD = fromIntegral canvasWidth
-    canvasHeightD = fromIntegral canvasHeight
+    (ni, nj) = model^.modelGame & getNiNj
+    canvasWidthD = fromIntegral $ nj*cellSize
+    canvasHeightD = fromIntegral $ ni*cellSize
 
-    nbPossibleMoves = length $ getMoves _modelGame
+    nbPossibleMoves = model^.modelGame & getMoves & length
 
     fmtStatus = \case
       XPlays  -> "X plays"
@@ -113,13 +110,13 @@ viewModel model@Model{..} =
 initCanvas :: DOMRef -> Canvas ()
 initCanvas _ = pure ()
 
-drawCanvas :: Double -> Double -> Model -> () -> Canvas ()
-drawCanvas canvasWidthD canvasHeightD Model{..} () = do
+drawCanvas :: Int -> Int -> Double -> Double -> Model -> () -> Canvas ()
+drawCanvas ni nj canvasWidthD canvasHeightD model () = do
   Canvas.clearRect (0, 0, canvasWidthD, canvasHeightD)
-  let bg = getBgColor _modelGame
+  let bg = if model^.modelGame & isRunning then bgColor else bgColorEnd
   drawBackground bg canvasWidthD canvasHeightD
-  drawGrid Style.black 3 3 cellSize cellSize canvasWidthD canvasHeightD
-  forGame _modelGame (drawGameCell bg)
+  drawGrid Style.black nj ni cellSize cellSize canvasWidthD canvasHeightD
+  forGame (model^.modelGame) (drawGameCell bg)
 
 drawGameCell :: Style.Color -> Int -> Int -> Cell -> Canvas ()
 drawGameCell bg i j = \case
@@ -162,9 +159,6 @@ drawO bg i j = do
   Canvas.fill ()
 
   Canvas.restore ()
-
-getBgColor :: Game -> Style.Color
-getBgColor game = if isRunning game then bgColor else bgColorEnd
 
 cs005, cs01, cs02, cs03, cs04, cs08 :: Double
 cs005 = cellSizeD * 0.05

@@ -1,12 +1,15 @@
 
 module Breakthrough.Game 
-  ( Game
+  ( Cell(..)
+  , Game
   , Move(..)
   , Status(..)
+  , forGame
   , getCurrentPlayer
   , getMoves
   , getMovesFrom
   , getMovesTo
+  , getNiNj
   , getStatus
   , isRunning
   , mkGame
@@ -121,6 +124,12 @@ getMovesTo from g =
     & filter ((==from) . _moveFrom)
     & map _moveTo
 
+getNiNj :: Game -> (Int, Int)
+getNiNj g = (g^.gameBoard^.boardNi, g^.gameBoard^.boardNj)
+
+forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
+forGame g = forBoard (g^.gameBoard)
+
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
@@ -133,10 +142,11 @@ mkBoard ni nj =
     replicate (2*nj) CellRed
 
 computeGame :: Int -> Int -> Player -> Game
-computeGame ni nj p = Game board RedPlays moves p p
+computeGame ni nj p = Game board status moves p p
   where
     board = mkBoard ni nj
     moves = computeMoves board p
+    status = if p == PlayerRed then RedPlays else BluePlays
 
 computeMoves :: Board -> Player -> [Move]
 computeMoves b = \case

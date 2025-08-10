@@ -10,7 +10,10 @@ spec = do
 
   describe "Breakthrough 1" $ do
 
-    it "todo 1" $ True `shouldBe` True
+    it "status 1" $ getStatus (mkGame 8 8) `shouldBe` RedPlays
+
+    it "status 2" $ getStatus (reset $ mkGame 8 8) `shouldBe` BluePlays
+
 
 -- TODO
 
