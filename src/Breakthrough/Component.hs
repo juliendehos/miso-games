@@ -3,10 +3,38 @@
 
 module Breakthrough.Component (mkComponent) where
 
+import Control.Monad (when)
 import Miso
+import Miso.Lens
+import Miso.Canvas (Canvas, canvas)
+import Miso.Canvas qualified as Canvas 
+import Miso.Style qualified as Style
 
+import Helpers.Canvas
 import Breakthrough.Game
 import Breakthrough.Model
+
+-------------------------------------------------------------------------------
+-- params and helpers
+-------------------------------------------------------------------------------
+
+bgColor, bgColorEnd :: Style.Color
+bgColor = Style.Hex "88DD88"
+bgColorEnd = Style.Hex "DDDDDD"
+
+cellSizeD, canvasSizeD :: Double
+cellSizeD = 20
+canvasSizeD = cellSizeD * 3
+
+cellSize :: Int
+cellSize = round cellSizeD
+
+xy2ij :: Double -> Double -> (Int, Int)
+xy2ij = xy2ij' cellSize cellSize
+
+ij2xyC :: Int -> Int -> (Double, Double)
+ij2xyC = ij2xyC' cellSize cellSize
+
 
 -------------------------------------------------------------------------------
 -- update

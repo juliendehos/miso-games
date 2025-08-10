@@ -24,16 +24,16 @@ drawGrid c ni nj di dj w h = do
     lineTo (w, y)
   Canvas.stroke ()
 
-xy2ij :: Int -> Int -> Double -> Double -> (Int, Int)
-xy2ij di dj x y = (floor y `div` di, floor x `div` dj)
+xy2ij' :: Int -> Int -> Double -> Double -> (Int, Int)
+xy2ij' di dj x y = (floor y `div` di, floor x `div` dj)
 
 -- top-left
-ij2xyTL :: Int -> Int -> Int -> Int -> (Double, Double)
-ij2xyTL di dj i j = (fromIntegral (j*dj), fromIntegral (i*di))
+ij2xyTL' :: Int -> Int -> Int -> Int -> (Double, Double)
+ij2xyTL' di dj i j = (fromIntegral (j*dj), fromIntegral (i*di))
 
 -- Center
-ij2xyC :: Int -> Int -> Int -> Int -> (Double, Double)
-ij2xyC di dj i j = 
+ij2xyC' :: Int -> Int -> Int -> Int -> (Double, Double)
+ij2xyC' di dj i j = 
   let x = (fromIntegral j + 0.5) * fromIntegral dj
       y = (fromIntegral i + 0.5) * fromIntegral di
   in (x, y)

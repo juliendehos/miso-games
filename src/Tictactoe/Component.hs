@@ -23,18 +23,23 @@ bgColor = Style.Hex "88DD88"
 bgColorEnd = Style.Hex "DDDDDD"
 fgColor = Style.red
 
-cellSizeD, canvasSizeD :: Double
-cellSizeD = 100
-canvasSizeD = cellSizeD * 3
-
 cellSize :: Int
-cellSize = round cellSizeD
+cellSize = 100
 
-xy2ij' :: Double -> Double -> (Int, Int)
-xy2ij' = xy2ij cellSize cellSize
+cellSizeD :: Double
+cellSizeD = fromIntegral cellSize
 
-ij2xyC' :: Int -> Int -> (Double, Double)
-ij2xyC' = ij2xyC cellSize cellSize
+xy2ij :: Double -> Double -> (Int, Int)
+xy2ij = xy2ij' cellSize cellSize
+
+ij2xyC :: Int -> Int -> (Double, Double)
+ij2xyC = ij2xyC' cellSize cellSize
+
+computeCanvasSize :: Model -> Int -> Int -> (Int, Int)
+computeCanvasSize model cellWidth cellHeight =
+  (nj*cellWidth, ni*cellHeight)
+  where
+    (ni, nj) = model^.modelGame & getNiNj
 
 -------------------------------------------------------------------------------
 -- action
@@ -54,7 +59,7 @@ updateModel (ActionAskPlay event) = do
   game <- use modelGame
   when (isRunning game && button event == 0) $ do
     player <- getCurrentPlayer <$> use modelGame
-    let (i, j) = uncurry xy2ij' $ offset event 
+    let (i, j) = uncurry xy2ij $ offset event 
         iStr = ms $ show i
         jStr = ms $ show j
         pStr = case player of
@@ -79,19 +84,23 @@ viewModel model@Model{..} =
   div_ [] 
     [ p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
     , canvas 
-        [ width_ (ms $ show canvasSizeD)
-        , height_ (ms $ show canvasSizeD)
+        [ width_ (ms $ show canvasWidth)
+        , height_ (ms $ show canvasHeight)
         , Style.style_  [Style.border "2px solid black"]
         , onPointerUp ActionAskPlay
         ]
       initCanvas
-      (drawCanvas model)
+      (drawCanvas canvasWidthD canvasHeightD model)
     , p_ [] [ text ("status: " <> fmtStatus (getStatus _modelGame)) ]
     , p_ [] [ text ("log: " <> _modelLog) ]
     , p_ [] [ text ("nb possible moves: " <> ms (show nbPossibleMoves)) ]
     ]
 
   where
+    (canvasWidth, canvasHeight) = computeCanvasSize model cellSize cellSize
+    canvasWidthD = fromIntegral canvasWidth
+    canvasHeightD = fromIntegral canvasHeight
+
     nbPossibleMoves = length $ getMoves _modelGame
 
     fmtStatus = \case
@@ -104,12 +113,12 @@ viewModel model@Model{..} =
 initCanvas :: DOMRef -> Canvas ()
 initCanvas _ = pure ()
 
-drawCanvas :: Model -> () -> Canvas ()
-drawCanvas Model{..} () = do
-  Canvas.clearRect (0, 0, canvasSizeD, canvasSizeD)
+drawCanvas :: Double -> Double -> Model -> () -> Canvas ()
+drawCanvas canvasWidthD canvasHeightD Model{..} () = do
+  Canvas.clearRect (0, 0, canvasWidthD, canvasHeightD)
   let bg = getBgColor _modelGame
-  drawBackground bg canvasSizeD canvasSizeD
-  drawGrid Style.black 3 3 cellSize cellSize canvasSizeD canvasSizeD
+  drawBackground bg canvasWidthD canvasHeightD
+  drawGrid Style.black 3 3 cellSize cellSize canvasWidthD canvasHeightD
   forGame _modelGame (drawGameCell bg)
 
 drawGameCell :: Style.Color -> Int -> Int -> Cell -> Canvas ()
@@ -125,13 +134,13 @@ drawX i j = do
   Canvas.fillStyle (Canvas.color fgColor)
 
   Canvas.save ()
-  Canvas.translate $ ij2xyC' i j
+  Canvas.translate $ ij2xyC i j
   Canvas.rotate (pi * 0.25)
   Canvas.fillRect (-cs005, -cs04, cs01, cs08)
   Canvas.restore ()
 
   Canvas.save ()
-  Canvas.translate $ ij2xyC' i j
+  Canvas.translate $ ij2xyC i j
   Canvas.rotate (pi * (-0.25))
   Canvas.fillRect (-cs005, -cs04, cs01, cs08)
   Canvas.restore ()
@@ -140,7 +149,7 @@ drawO :: Style.Color -> Int -> Int -> Canvas ()
 drawO bg i j = do
 
   Canvas.save ()
-  Canvas.translate $ ij2xyC' i j
+  Canvas.translate $ ij2xyC i j
 
   Canvas.beginPath ()
   Canvas.fillStyle (Canvas.color fgColor)

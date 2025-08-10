@@ -7,10 +7,11 @@ module Tictactoe.Game
   , Player(..)
   , Status(..)
   , forGame
+  , getCurrentPlayer
   , getPlayers
   , getMoves
+  , getNiNj
   , getStatus
-  , getCurrentPlayer
   , isRunning
   , mkGame
   , play
@@ -111,6 +112,9 @@ isRunning Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame Game{..} = forBoard _gameBoard
+
+getNiNj :: Game -> (Int, Int)
+getNiNj Game{..} = (_boardNi _gameBoard, _boardNj _gameBoard)
 
 -------------------------------------------------------------------------------
 -- internal

@@ -45,11 +45,11 @@ n2color = \case
 -- helpers
 -------------------------------------------------------------------------------
 
-ij2xy' :: Int -> Int -> (Double, Double)
-ij2xy' = ij2xyTL cellSize cellSize
+ij2xy :: Int -> Int -> (Double, Double)
+ij2xy = ij2xyTL' cellSize cellSize
 
-xy2ij' :: Double -> Double -> (Int, Int)
-xy2ij' = xy2ij cellSize cellSize
+xy2ij :: Double -> Double -> (Int, Int)
+xy2ij = xy2ij' cellSize cellSize
 
 -------------------------------------------------------------------------------
 -- Action
@@ -73,7 +73,7 @@ updateModel (ActionSetModel model) =
 updateModel (ActionAskPlay event) = do
   running <- isRunning <$> use modelGame
   when running $ do
-    let (i, j) = uncurry xy2ij' $ offset event 
+    let (i, j) = uncurry xy2ij $ offset event 
     case button event of
       0 -> do
         io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
@@ -138,12 +138,8 @@ viewModel model = div_ []
       StatusWon       -> "won"
       StatusLost      -> "lost"
 
-    -- rightClick = onWithOptions (defaultOptions { preventDefault = True }) "contextmenu" emptyDecoder $ \() -> ActionNone
-
-
 initCanvas :: DOMRef -> Canvas ()
 initCanvas _ = pure ()
--- initCanvas = disableRightClick
 
 drawCanvas :: Model -> () -> Canvas ()
 drawCanvas model () = do
@@ -165,7 +161,7 @@ drawMine :: Bool -> Int -> Int -> Canvas ()
 drawMine wrong i j = do
 
   save ()
-  translate $ ij2xy' i j
+  translate $ ij2xy i j
 
   when wrong $ drawCell colorWrongMine
 
@@ -196,7 +192,7 @@ drawFlag :: Bool -> Int -> Int -> Canvas ()
 drawFlag wrong i j = do
 
   save ()
-  translate $ ij2xy' i j
+  translate $ ij2xy i j
 
   when wrong $ drawCell colorWrongFlag
 
@@ -216,7 +212,7 @@ drawFlag wrong i j = do
 drawFree :: Int -> Int -> Int -> Canvas ()
 drawFree i j n = do
   save ()
-  translate $ ij2xy' i j
+  translate $ ij2xy i j
   drawCell colorYes
   fillStyle (color $ n2color n)
   when (n > 0) $ fillText (ms (show n), cs03, cs08)
@@ -239,7 +235,6 @@ mkComponent :: StdGen -> Component m Model Action
 mkComponent gen = do
   let initialModel = runST $ mkModel ModeBeginner gen
   (component initialModel updateModel viewModel)
-    -- { events = defaultEvents <> M.insert "contextmenu" False pointerEvents
     { events = defaultEvents <> pointerEvents
     -- , logLevel = DebugAll
     }
