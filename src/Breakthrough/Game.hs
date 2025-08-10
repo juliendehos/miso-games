@@ -3,6 +3,7 @@ module Breakthrough.Game
   ( Cell(..)
   , Game
   , Move(..)
+  , Player(..)
   , Status(..)
   , forGame
   , getCurrentPlayer
@@ -90,7 +91,7 @@ play m g =
       let
         -- apply move
         cell = g^.gameCurrentPlayer & player2cell
-        board' = g^.gameBoard & setIJs [(m^.moveFrom, CellRed), (m^.moveTo, cell)] 
+        board' = g^.gameBoard & setIJs [(m^.moveFrom, CellEmpty), (m^.moveTo, cell)] 
         -- update status and current player
         (status', player') =
           case (isWinning m g, g^.gameCurrentPlayer) of

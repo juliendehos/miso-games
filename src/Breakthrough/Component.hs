@@ -49,10 +49,38 @@ data Action
 updateModel :: Action -> Effect parentModel Model Action
 
 updateModel (ActionAskPlay event) = do
-  pure ()   -- TODO
+  game <- use modelGame
+  when (isRunning game && button event == 0) $ do
+    selected <- use modelSelected
+    let ij@(i, j) = uncurry xy2ij $ offset event 
+        ijStr = ms (show i <> " " <> show j)
+        playerStr = case game & getCurrentPlayer of
+          PlayerRed -> "Red"
+          PlayerBlue -> "Blue"
+    case selected of
+      Nothing -> 
+        when (ij `elem` getMovesFrom game) $ do
+          modelSelected .= Just ij
+          modelLog .= playerStr <> " selected " <> ijStr
+      Just ij0@(i0, j0) -> do
+        modelSelected .= Nothing
+        let ij0Str = ms (show i0 <> " " <> show j0)
+        if ij `elem` getMovesTo ij0 game
+          then case play (Move ij0 ij) game of
+            Nothing -> modelLog .= playerStr <> " failed to play " <> ij0Str <> " " <> ijStr
+            Just g1 -> do
+              modelGame .= g1
+              modelLog .= playerStr <> " played " <> ij0Str <> " " <> ijStr
+          else 
+            if ij `elem` getMovesFrom game
+              then do
+                modelSelected .= Just ij
+                modelLog .= playerStr <> " selected " <> ijStr
+              else modelLog .= playerStr <> " deselected " <> ij0Str
 
 updateModel ActionNewGame = do
   modelGame %= Breakthrough.Game.reset
+  modelSelected .= Nothing
   modelLog .= "new game"
 
 -------------------------------------------------------------------------------
@@ -103,7 +131,15 @@ drawCanvas ni nj canvasWidthD canvasHeightD model () = do
 
 drawMoves :: Model -> Canvas ()
 drawMoves model = 
-  forM_ (model^.modelGame & getMovesFrom) $ uncurry (drawDisc Style.white cs045)
+  case model^.modelSelected of
+    Nothing -> 
+      forM_ (model^.modelGame & getMovesFrom) $ 
+        uncurry (drawDisc Style.white cs045)
+    Just ij0@(i0, j0) -> do
+      drawDisc Style.black cs045 i0 j0
+      forM_ (model^.modelGame & getMovesTo ij0) $ \(i1, j1) -> do
+        drawDisc Style.white cs045 i1 j1
+        drawDisc bgColor cs04 i1 j1
 
 drawGameCell :: Int -> Int -> Cell -> Canvas ()
 drawGameCell i j = \case
