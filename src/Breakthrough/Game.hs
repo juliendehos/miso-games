@@ -93,14 +93,15 @@ play m g =
         cell = g^.gameCurrentPlayer & player2cell
         board' = g^.gameBoard & setIJs [(m^.moveFrom, CellEmpty), (m^.moveTo, cell)] 
         -- update status and current player
+        winning = isWinning m g
         (status', player') =
-          case (isWinning m g, g^.gameCurrentPlayer) of
+          case (winning, g^.gameCurrentPlayer) of
             (True, PlayerRed)   -> (RedWins, PlayerRed)
             (True, PlayerBlue)  -> (BlueWins, PlayerBlue)
             (False, PlayerRed)  -> (BluePlays, PlayerBlue)
             (False, PlayerBlue) -> (RedPlays, PlayerRed)
         -- update moves
-        moves' = computeMoves board' player'
+        moves' = if winning then [] else computeMoves board' player'
       in Just $ Game board' status' moves' (g^.gameInitialPlayer) player'
     else Nothing
 
@@ -176,6 +177,6 @@ player2cell = \case
 isWinning :: Move -> Game -> Bool
 isWinning m g =
   case g ^. gameCurrentPlayer of
-    PlayerRed -> (m^.moveTo & snd) == 0
-    PlayerBlue -> (m^.moveTo & snd) == (g^.gameBoard^.boardNj - 1)
+    PlayerRed -> (m^.moveTo & fst) == 0
+    PlayerBlue -> (m^.moveTo & fst) == (g^.gameBoard^.boardNj - 1)
 
