@@ -88,9 +88,13 @@ viewModel model =
         ]
       initCanvas
       (drawCanvas ni nj canvasWidthD canvasHeightD model)
-    , p_ [] [ text ("status: " <> (model^.modelGame & getStatus & fmtStatus)) ]
-    , p_ [] [ text ("log: " <> model^.modelLog) ]
-    , p_ [] [ text ("nb possible moves: " <> ms (show nbPossibleMoves)) ]
+    , p_ [] 
+        [ text ("status: " <> (model^.modelGame & getStatus & fmtStatus))
+        , br_ []
+        , text ("nb possible moves: " <> ms (show nbPossibleMoves))
+        , br_ []
+        , text ("log: " <> model^.modelLog)
+        ]
     ]
 
   where

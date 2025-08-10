@@ -78,7 +78,7 @@ mkGame (ni, nj, nbMines) gen = do
   pure game
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
-forGame game f = A.iforM_ (game ^. gameCells) $ \(Ix2 i j) c -> f i j c
+forGame Game{..} f = A.iforM_ _gameCells $ \(Ix2 i j) c -> f i j c
 
 play :: Move -> Game -> Game
 play move game =

@@ -3,7 +3,6 @@
 module App.Model where
 
 import Control.Monad.Primitive
-import Miso
 import Miso.Lens
 import Miso.Lens.TH
 import System.Random
@@ -15,8 +14,8 @@ data GameType
   deriving (Eq)
 
 data Model = Model
-  { _mGameType :: GameType
-  , _mGen :: StdGen
+  { _modelGameType :: GameType
+  , _modelGen :: StdGen
   } deriving (Eq)
 
 makeLenses ''Model

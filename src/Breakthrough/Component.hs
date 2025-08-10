@@ -70,7 +70,7 @@ updateModel (ActionAskPlay event) = do
             Nothing -> modelLog .= playerStr <> " failed to play " <> ij0Str <> " " <> ijStr
             Just g1 -> do
               modelGame .= g1
-              modelLog .= playerStr <> " played " <> ij0Str <> " " <> ijStr
+              modelLog .= playerStr <> " played " <> ij0Str <> " -> " <> ijStr
           else 
             if ij `elem` getMovesFrom game
               then do
@@ -102,8 +102,11 @@ viewModel model =
         ]
       initCanvas
       (drawCanvas ni nj canvasWidthD canvasHeightD model)
-    , p_ [] [ text ("status: " <> (model^.modelGame & getStatus & fmtStatus)) ]
-    , p_ [] [ text ("log: " <> model^.modelLog) ]
+    , p_ [] 
+        [ text ("status: " <> (model^.modelGame & getStatus & fmtStatus))
+        , br_ []
+        , text ("log: " <> model^.modelLog)
+        ]
     ]
 
   where

@@ -41,10 +41,10 @@ mkBoardFromVal :: Int -> Int -> a -> Board' a
 mkBoardFromVal ni nj v = Board' ni nj (V.replicate (ni*nj) v)
 
 getK :: Int -> Board' a -> a
-getK k b = (b^.boardData) ! k
+getK k Board'{..} = _boardData ! k
 
 getIJ :: Int -> Int -> Board' a -> a
-getIJ i j b = (b^.boardData) ! ij2k' b i j
+getIJ i j b@Board'{..} = _boardData ! ij2k' b i j
 
 setK :: Int -> a -> Board' a -> Board' a
 setK k v b = b & boardData %~ (// [(k, v)])

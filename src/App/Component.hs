@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 
 module App.Component where
 
@@ -22,31 +21,24 @@ newtype Action
 updateModel :: Action -> Transition Model Action
 updateModel (ActionAskGame gt) = do
   case gt of
-    "Breakthrough" -> do
-      mGameType .= Breakthrough
-      io_ $ consoleLog "Breakthrough"
-    "Minesweeper" -> do
-      mGameType .= Minesweeper
-      io_ $ consoleLog "Minesweeper"
-    "Tictactoe" -> do
-      mGameType .= Tictactoe
-      io_ $ consoleLog "Tictactoe"
-    _ -> do
-      io_ $ consoleLog "unknown game"
+    "Breakthrough"  -> modelGameType .= Breakthrough
+    "Minesweeper"   -> modelGameType .= Minesweeper
+    "Tictactoe"     -> modelGameType .= Tictactoe
+    _               -> pure ()
 
 -------------------------------------------------------------------------------
 -- View
 -------------------------------------------------------------------------------
 
 viewModel :: Model -> View Model Action
-viewModel Model{..} = 
+viewModel model = 
   div_ [] 
     [ p_ [] 
         [ text "Game: "
         , select_ [ onChange ActionAskGame ]
-            [ option_ [ selected_ (_mGameType == Breakthrough) ]  [ "Breakthrough" ]
-            , option_ [ selected_ (_mGameType == Minesweeper) ]   [ "Minesweeper" ]
-            , option_ [ selected_ (_mGameType == Tictactoe) ]     [ "Tictactoe" ]
+            [ option_ [ selected_ (model^.modelGameType == Breakthrough) ]  [ "Breakthrough" ]
+            , option_ [ selected_ (model^.modelGameType == Minesweeper) ]   [ "Minesweeper" ]
+            , option_ [ selected_ (model^.modelGameType == Tictactoe) ]     [ "Tictactoe" ]
             ]
         ]
     -- , p_ [] [ "player 2: TODO" ]
@@ -54,22 +46,26 @@ viewModel Model{..} =
     ]
 
   where
-    gameDiv = case _mGameType of
+    gameDiv = case model^.modelGameType of
       Breakthrough -> 
         div_ []
           [ h2_ [] [ "Breakthrough" ]
-          , div_ [ key_ ("Breakthrough"::MisoString) ] +> Breakthrough.mkComponent
+          , div_ [ key_ ("Breakthrough"::MisoString) ] +> 
+              Breakthrough.mkComponent
           ]
       Minesweeper -> 
         div_ []
           [ h2_ [] [ "Minesweeper" ]
-          , div_ [ key_ ("Minesweeper"::MisoString) ] +> Minesweeper.mkComponent _mGen   -- TODO update _mGen
+          , div_ [ key_ ("Minesweeper"::MisoString) ] +> 
+              Minesweeper.mkComponent (model^.modelGen)
           ]
       Tictactoe -> 
         div_ []
           [ h2_ [] [ "Tictactoe" ]
-          , div_ [ key_ ("Tictactoe"::MisoString) ] +> Tictactoe.mkComponent
+          , div_ [ key_ ("Tictactoe"::MisoString) ] +> 
+              Tictactoe.mkComponent
           ]
+-- TODO bidirectional component
 
 -------------------------------------------------------------------------------
 -- Component

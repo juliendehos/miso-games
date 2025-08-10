@@ -75,10 +75,10 @@ updateModel (ActionAskPlay event) = do
     let (i, j) = uncurry xy2ij $ offset event 
     case button event of
       0 -> do
-        io_ (consoleLog ("playFree " <> ms (show i) <> " " <> ms (show j)))
+        modelLog .= "playFree " <> ms (show i) <> " " <> ms (show j)
         modelGame %= play (MoveFree i j)
       2 -> do
-        io_ (consoleLog ("playFlag " <> ms (show i) <> " " <> ms (show j)))
+        modelLog .= "playFlag " <> ms (show i) <> " " <> ms (show j)
         modelGame %= play (MoveFlag i j)
       _ -> pure ()
 
@@ -127,6 +127,8 @@ viewModel model = div_ []
         , text ("mines: " <> ms (show $ model ^. modelGame & getNbMines))
         , br_ []
         , text ("remaining cells: " <> ms (show $ model ^. modelGame & getRemCells))
+        , br_ []
+        , text ("log: " <> model^.modelLog)
         ]
   ]
   where

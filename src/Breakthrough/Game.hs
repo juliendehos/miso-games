@@ -78,8 +78,8 @@ reset :: Game -> Game
 reset g = 
   computeGame 
     (g^.gameBoard^.boardNi)
-    (g^.gameBoard^.boardNj) 
-    (if g ^. gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
+    (g^.gameBoard^.boardNj)
+    (if g^.gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
 
 isRunning :: Game -> Bool
 isRunning g = g^.gameStatus == RedPlays || g^.gameStatus == BluePlays
