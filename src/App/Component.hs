@@ -41,7 +41,6 @@ viewModel model =
             , option_ [ selected_ (model^.modelGameType == Tictactoe) ]     [ "Tictactoe" ]
             ]
         ]
-    -- , p_ [] [ "player 2: TODO" ]
     , gameDiv
     ]
 

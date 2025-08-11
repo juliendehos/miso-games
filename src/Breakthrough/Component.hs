@@ -41,6 +41,7 @@ ij2xyC = ij2xyC' cellSize cellSize
 data Action 
   = ActionAskPlay PointerEvent
   | ActionNewGame
+  -- TODO | ActionAskBot
 
 -------------------------------------------------------------------------------
 -- update

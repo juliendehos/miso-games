@@ -45,6 +45,7 @@ ij2xyC = ij2xyC' cellSize cellSize
 data Action 
   = ActionAskPlay PointerEvent
   | ActionNewGame
+  -- TODO | ActionAskPlayer2
 
 -------------------------------------------------------------------------------
 -- update
@@ -56,13 +57,19 @@ updateModel (ActionAskPlay event) = do
   game <- use modelGame
   when (isRunning game && button event == 0) $ do
     player <- getCurrentPlayer <$> use modelGame
-    let (i, j) = uncurry xy2ij $ offset event 
-        iStr = ms $ show i
+    let (i0, j0) = uncurry xy2ij $ offset event 
+
+    -- TODO run player2 automatically, if it's a bot
+    move@(Move i j) <- case player of
+      PlayerX -> pure (Move i0 j0)
+      PlayerO -> genMovePlayerO i0 j0
+
+    let iStr = ms $ show i
         jStr = ms $ show j
         pStr = case player of
           PlayerX -> "X"
           PlayerO -> "O"
-    case play (Move i j) game of
+    case play move game of
       Nothing -> modelLog .= pStr <> " failed to play " <> iStr <> " " <> jStr
       Just game' -> do
         modelLog .= pStr <> " played " <> iStr <> " " <> jStr

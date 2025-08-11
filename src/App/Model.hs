@@ -27,10 +27,20 @@ data AppModel = AppModel
 makeLenses ''AppModel
 
 mkAppModel :: StdGen -> AppModel
-mkAppModel gen = 
-  AppModel
-    Breakthrough
-    Breakthrough.mkModel
-    (runST $ Minesweeper.mkModel Minesweeper.ModeBeginner gen)
-    Tictactoe.mkModel
+mkAppModel gen0 = 
+  let
+    (gen1, gen1') = splitGen gen0
+    breakthroughModel = Breakthrough.mkModel gen1'
+
+    (gen2, gen2') = splitGen gen1
+    minesweeperModel = runST $ Minesweeper.mkModel Minesweeper.ModeBeginner gen2'
+
+    gen3' = gen2
+    tictactoeModel = Tictactoe.mkModel gen3'
+
+  in AppModel
+      Breakthrough
+      breakthroughModel
+      minesweeperModel
+      tictactoeModel
 

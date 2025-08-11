@@ -29,6 +29,7 @@ executable app
   main-is:
     Main.hs
   other-modules:
+    Bot
     Game
     Helpers.Board
     Helpers.Canvas
@@ -67,10 +68,8 @@ test-suite spec
   build-depends:
     base,
     hspec,
-    massiv,
     miso,
     mtl,
-    QuickCheck,
     random,
     vector
   other-modules:
