@@ -22,7 +22,7 @@ bgColor = Style.Hex "88DD88"
 bgColorEnd = Style.Hex "DDDDDD"
 
 cellSize :: Int
-cellSize = 70
+cellSize = 50
 
 -------------------------------------------------------------------------------
 -- helpers

@@ -78,8 +78,6 @@ test-suite spec
     Helpers.BoardSpec
     Breakthrough.Game
     Breakthrough.GameSpec
-    Minesweeper.Game
-    Minesweeper.GameSpec
     Tictactoe.Game
     Tictactoe.GameSpec
   default-language:
