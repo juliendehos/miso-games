@@ -18,7 +18,7 @@ import Tictactoe.Component as Tictactoe
 newtype Action 
   = ActionAskGame MisoString
 
-updateModel :: Action -> Transition Model Action
+updateModel :: Action -> Transition AppModel Action
 updateModel (ActionAskGame gt) = do
   case gt of
     "Breakthrough"  -> modelGameType .= Breakthrough
@@ -30,11 +30,11 @@ updateModel (ActionAskGame gt) = do
 -- View
 -------------------------------------------------------------------------------
 
-viewModel :: Model -> View Model Action
+viewModel :: AppModel -> View AppModel Action
 viewModel model = 
   div_ [] 
     [ p_ [] 
-        [ text "Game: "
+        [ text "game: "
         , select_ [ onChange ActionAskGame ]
             [ option_ [ selected_ (model^.modelGameType == Breakthrough) ]  [ "Breakthrough" ]
             , option_ [ selected_ (model^.modelGameType == Minesweeper) ]   [ "Minesweeper" ]
@@ -46,31 +46,35 @@ viewModel model =
     ]
 
   where
+    fmtInfo name url = p_ [] [ text "you're playing " , a_ [href_ url] [name] ]
+
     gameDiv = case model^.modelGameType of
       Breakthrough -> 
         div_ []
-          [ h2_ [] [ "Breakthrough" ]
+          [ fmtInfo "Breakthrough" "https://en.wikipedia.org/wiki/Breakthrough_(board_game)"
           , div_ [ key_ ("Breakthrough"::MisoString) ] +> 
-              Breakthrough.mkComponent
+              (model^.modelBreakthrough & Breakthrough.mkComponent)
+                { bindings = [ modelBreakthrough <--> this ] }
           ]
       Minesweeper -> 
         div_ []
-          [ h2_ [] [ "Minesweeper" ]
+          [ fmtInfo "Minesweeper" "https://en.wikipedia.org/wiki/Minesweeper" 
           , div_ [ key_ ("Minesweeper"::MisoString) ] +> 
-              Minesweeper.mkComponent (model^.modelGen)
+              (model^.modelMinesweeper & Minesweeper.mkComponent)
+                { bindings = [ modelMinesweeper <--> this ] }
           ]
       Tictactoe -> 
         div_ []
-          [ h2_ [] [ "Tictactoe" ]
+          [ fmtInfo "Tictactoe" "https://en.wikipedia.org/wiki/Tic-tac-toe" 
           , div_ [ key_ ("Tictactoe"::MisoString) ] +> 
-              Tictactoe.mkComponent
+              (model^.modelTictactoe & Tictactoe.mkComponent)
+                { bindings = [ modelTictactoe <--> this ] }
           ]
--- TODO bidirectional component
 
 -------------------------------------------------------------------------------
 -- Component
 -------------------------------------------------------------------------------
 
-mkComponent :: Model -> App Model Action
+mkComponent :: AppModel -> App AppModel Action
 mkComponent model = component model updateModel viewModel
 

@@ -176,10 +176,9 @@ cs08 = cellSizeD * 0.8
 -- component
 -------------------------------------------------------------------------------
 
-mkComponent :: Component m Model Action
-mkComponent = do
-  let initialModel = mkModel
-  (component initialModel updateModel viewModel)
+mkComponent :: Model -> Component m Model Action
+mkComponent model = 
+  (component model updateModel viewModel)
     { events = defaultEvents <> pointerEvents
     -- , logLevel = DebugAll
     }

@@ -2,10 +2,14 @@
 
 module App.Model where
 
-import Control.Monad.Primitive
+import Control.Monad.ST
 import Miso.Lens
 import Miso.Lens.TH
 import System.Random
+
+import Breakthrough.Model as Breakthrough
+import Minesweeper.Model as Minesweeper
+import Tictactoe.Model as Tictactoe
 
 data GameType
   = Breakthrough
@@ -13,13 +17,20 @@ data GameType
   | Tictactoe
   deriving (Eq)
 
-data Model = Model
-  { _modelGameType :: GameType
-  , _modelGen :: StdGen
+data AppModel = AppModel
+  { _modelGameType      :: GameType
+  , _modelBreakthrough  :: Breakthrough.Model
+  , _modelMinesweeper   :: Minesweeper.Model
+  , _modelTictactoe     :: Tictactoe.Model
   } deriving (Eq)
 
-makeLenses ''Model
+makeLenses ''AppModel
 
-mkModel :: (PrimMonad m) => StdGen -> m Model
-mkModel = pure . Model Breakthrough
+mkAppModel :: StdGen -> AppModel
+mkAppModel gen = 
+  AppModel
+    Breakthrough
+    Breakthrough.mkModel
+    (runST $ Minesweeper.mkModel Minesweeper.ModeBeginner gen)
+    Tictactoe.mkModel
 

@@ -1,18 +1,16 @@
 
-import Control.Monad.IO.Class (liftIO)
 import Miso
 import System.Random (getStdGen)
 
 import App.Component (mkComponent)
-import App.Model (mkModel)
+import App.Model (mkAppModel)
 
 main :: IO ()
 main = run $ do
-  gen <- getStdGen
-  model <- liftIO (mkModel gen)
+  model <- mkAppModel <$> getStdGen
   let appComponent = mkComponent model
   startComponent appComponent
-    { logLevel = DebugAll }
+    -- { logLevel = DebugAll }
 
 #ifdef WASM
 foreign export javascript "hs_start" main :: IO ()

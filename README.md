@@ -1,10 +1,5 @@
 # :ramen: miso-games
 
-## TODO
-
-- remember the game states (using the (<-->) combinator)
-- add unit tests (for games)?
-
 ## Solo games
 
 - [x] [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper)
@@ -13,7 +8,7 @@
 ## Two-player games
 
 - [x] [Tic-tac-toe](https://en.wikipedia.org/wiki/Tic-tac-toe)
-- [ ] [Breakthrough](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
+- [x] [Breakthrough](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
 - [ ] [Gomoku](https://en.wikipedia.org/wiki/Gomoku)
 - [ ] [Reversi/Othello](https://en.wikipedia.org/wiki/Reversi)
 

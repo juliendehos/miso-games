@@ -4,12 +4,10 @@ module Minesweeper.Component (mkComponent) where
 
 import Control.Monad (when)
 import Control.Monad.IO.Class (liftIO)
-import Control.Monad.ST
 import Miso
 import Miso.Canvas as Canvas
 import Miso.Lens
 import Miso.Style qualified as Style
-import System.Random
 
 import Helpers.Canvas
 import Minesweeper.Game
@@ -104,12 +102,12 @@ cs09 = cellSizeD * 0.9
 
 viewModel :: Model -> View Model Action
 viewModel model = div_ [] 
-  [ p_ [] 
+  [ p_ [] [ "left-click to discover, right-click to flag/unflag" ]
+  , p_ [] 
       [ button_ [ onClick (ActionAskReset ModeBeginner) ]     [ "beginner" ]
       , button_ [ onClick (ActionAskReset ModeIntermediate) ] [ "intermediate" ]
       , button_ [ onClick (ActionAskReset ModeExpert) ]       [ "expert" ]
       ]
-  , p_ [] [ "left-click to discover, right-click to flag/unflag" ]
   , Canvas.canvas 
       [ width_ (ms $ nj * cellSize)
       , height_ (ms $ ni * cellSize)
@@ -232,10 +230,9 @@ drawGameCell i j = \case
 -- component
 -------------------------------------------------------------------------------
 
-mkComponent :: StdGen -> Component m Model Action
-mkComponent gen = do
-  let initialModel = runST $ mkModel ModeBeginner gen
-  (component initialModel updateModel viewModel)
+mkComponent :: Model -> Component m Model Action
+mkComponent model =
+  (component model updateModel viewModel)
     { events = defaultEvents <> pointerEvents
     -- , logLevel = DebugAll
     }
