@@ -19,6 +19,7 @@ module Tictactoe.Game
   ) where
 
 import Helpers.Board
+import Game
 
 -------------------------------------------------------------------------------
 -- types
@@ -60,6 +61,9 @@ data Game = Game
 -------------------------------------------------------------------------------
 -- export
 -------------------------------------------------------------------------------
+
+instance GameClass Game Move where
+  getPossibleMoves = getMoves
 
 play :: Move -> Game -> Maybe Game
 play m@(Move i j) g@Game{..} =

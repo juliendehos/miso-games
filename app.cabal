@@ -29,7 +29,8 @@ executable app
   main-is:
     Main.hs
   other-modules:
-    Bot
+    -- Bot TODO?
+    Bot.Random
     Game
     Helpers.Board
     Helpers.Canvas

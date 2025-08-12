@@ -2,7 +2,8 @@
 
 module Tictactoe.Component (mkComponent) where
 
-import Control.Monad (when)
+import Control.Monad (when, forM_)
+import Data.Maybe (fromMaybe)
 import Miso
 import Miso.Lens
 import Miso.Canvas (Canvas, canvas)
@@ -45,7 +46,6 @@ ij2xyC = ij2xyC' cellSize cellSize
 data Action 
   = ActionAskPlay PointerEvent
   | ActionNewGame
-  -- TODO | ActionAskPlayer2
 
 -------------------------------------------------------------------------------
 -- update
@@ -53,31 +53,46 @@ data Action
 
 updateModel :: Action -> Effect parentModel Model Action
 
-updateModel (ActionAskPlay event) = do
-  game <- use modelGame
-  when (isRunning game && button event == 0) $ do
-    player <- getCurrentPlayer <$> use modelGame
-    let (i0, j0) = uncurry xy2ij $ offset event 
-
-    -- TODO run player2 automatically, if it's a bot
-    move@(Move i j) <- case player of
-      PlayerX -> pure (Move i0 j0)
-      PlayerO -> genMovePlayerO i0 j0
-
-    let iStr = ms $ show i
-        jStr = ms $ show j
-        pStr = case player of
-          PlayerX -> "X"
-          PlayerO -> "O"
-    case play move game of
-      Nothing -> modelLog .= pStr <> " failed to play " <> iStr <> " " <> jStr
-      Just game' -> do
-        modelLog .= pStr <> " played " <> iStr <> " " <> jStr
-        modelGame .= game'
-
 updateModel ActionNewGame = do
   modelGame %= Tictactoe.Game.reset
   modelLog .= "new game"
+
+updateModel (ActionAskPlay event) = do
+  game <- use modelGame
+  when (isRunning game && button event == 0) $ do
+    let (i, j) = uncurry xy2ij $ offset event 
+    case getCurrentPlayer game of
+      PlayerX -> do
+        doPlay PlayerX (Move i j)
+        tryPlayBotO
+      PlayerO -> do
+        moveO <- fromMaybe (Move i j) <$> genMovePlayerO
+        doPlay PlayerO moveO
+
+doPlay :: Player -> Move -> Effect parentModel Model Action
+doPlay player move@(Move i j) = do
+  game <- use modelGame
+  case play move game of
+    Nothing -> modelLog .= fmtLogPlay player False i j
+    Just game' -> do
+      modelLog .= fmtLogPlay player True i j
+      modelGame .= game'
+
+tryPlayBotO :: Effect parentModel Model Action
+tryPlayBotO = do
+  game <- use modelGame
+  let player = getCurrentPlayer game
+  when (isRunning game && player == PlayerO) $ do
+    mMoveO <- genMovePlayerO
+    forM_ mMoveO (doPlay PlayerO)
+
+fmtLogPlay :: Player -> Bool -> Int -> Int -> MisoString
+fmtLogPlay p ok i j =
+  let pStr = if p == PlayerX then "X" else "O"
+      okStr = if ok then "played" else "failed to play"
+      iStr = ms $ show i
+      jStr = ms $ show j
+  in pStr <> " " <> okStr <> " " <> iStr <> " " <> jStr
 
 -------------------------------------------------------------------------------
 -- view

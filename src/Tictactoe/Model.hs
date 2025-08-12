@@ -8,13 +8,14 @@ import Miso.Lens
 import Miso.Lens.TH
 import System.Random
 
+import Bot.Random
 import Tictactoe.Game
 
 data PlayerType
   = Human
-  | Random
-  | McEasy
-  | McHard
+  | BotRandom
+  -- | BotMcEasy   -- TODO
+  -- | BotMcHard
   deriving (Eq)
 
 data Model = Model
@@ -27,12 +28,18 @@ data Model = Model
 makeLenses ''Model
 
 mkModel :: StdGen -> Model
-mkModel = Model mkGame "this is Tictactoe" Random  -- TODO Human
+mkModel = Model mkGame "this is Tictactoe" Human
 
-genMovePlayerO :: MonadState Model m => Int -> Int -> m Move
-genMovePlayerO i j = do
+genMovePlayerO :: MonadState Model m => m (Maybe Move)
+genMovePlayerO = do
   playerType <- use modelPlayerO
-  case playerType of
-    Human -> pure (Move i j)
-    _ -> head . getMoves <$> use modelGame  -- TODO
+  game <- use modelGame
+  gen <- use modelPlayerOGen
+  let (move, gen') = case playerType of
+          Human -> (Nothing, gen)
+          BotRandom -> runState (Bot.Random.genMove game) gen
+          -- BotMcEasy -> TODO
+          -- BotMcHard -> TODO
+  modelPlayerOGen .= gen'
+  pure move
 
