@@ -4,6 +4,7 @@ module Tictactoe.GameSpec (spec) where
 import Data.Maybe (fromMaybe)
 import Test.Hspec
 
+import Game
 import Tictactoe.Game
 
 playMoves :: Game -> [Move] -> Game

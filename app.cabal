@@ -74,6 +74,7 @@ test-suite spec
     random,
     vector
   other-modules:
+    Game
     Helpers.Board
     Helpers.BoardSpec
     Breakthrough.Game

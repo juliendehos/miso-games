@@ -2,7 +2,7 @@
 
 module Breakthrough.Model where
 
-import Control.Monad.State.Strict
+import Control.Monad.State.Lazy
 import Miso
 import Miso.Lens
 import Miso.Lens.TH
@@ -16,7 +16,7 @@ data PlayerType
   = Human
   | BotRandom
   | BotMcEasy
-  | BotMcHard
+  | BotMcMedium
   deriving (Eq)
 
 data Model = Model
@@ -41,7 +41,7 @@ genMovePlayerBlue = do
           Human -> (Nothing, gen)
           BotRandom -> runState (Bot.Random.genMove game) gen
           BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
-          BotMcHard -> runState (Bot.MonteCarlo.genMove 100 game) gen
+          BotMcMedium -> runState (Bot.MonteCarlo.genMove 100 game) gen
   modelPlayerBlueGen .= gen'
   pure move
 

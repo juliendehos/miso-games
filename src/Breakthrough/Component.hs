@@ -54,11 +54,11 @@ updateModel (ActionAskPlayerBlue pt) = do
   modelSelected .= Nothing
   modelLog .= pt <> " plays Blue"
   case pt of
-    "Human"   -> modelPlayerBlue .= Human
-    "Random"  -> modelPlayerBlue .= BotRandom >> tryPlayBotBlue
-    "McEasy"  -> modelPlayerBlue .= BotMcEasy >> tryPlayBotBlue
-    "McHard"  -> modelPlayerBlue .= BotMcHard >> tryPlayBotBlue
-    _         -> pure ()
+    "Human"     -> modelPlayerBlue .= Human
+    "Random"    -> modelPlayerBlue .= BotRandom >> tryPlayBotBlue
+    "McEasy"    -> modelPlayerBlue .= BotMcEasy >> tryPlayBotBlue
+    "McMedium"  -> modelPlayerBlue .= BotMcMedium >> tryPlayBotBlue
+    _           -> pure ()
 
 updateModel ActionNewGame = do
   modelGame %= Breakthrough.Game.reset
@@ -130,10 +130,10 @@ viewModel model =
     [ p_ [] 
         [ text "player Blue: "
         , select_ [ onChange ActionAskPlayerBlue ]
-            [ option_ [ selected_ (model^.modelPlayerBlue == Human) ]      [ "Human" ]
-            , option_ [ selected_ (model^.modelPlayerBlue == BotRandom) ]  [ "Random" ]
-            , option_ [ selected_ (model^.modelPlayerBlue == BotMcEasy) ]  [ "McEasy" ]
-            , option_ [ selected_ (model^.modelPlayerBlue == BotMcHard) ]  [ "McHard" ]
+            [ option_ [ selected_ (model^.modelPlayerBlue == Human) ]       [ "Human" ]
+            , option_ [ selected_ (model^.modelPlayerBlue == BotRandom) ]   [ "Random" ]
+            , option_ [ selected_ (model^.modelPlayerBlue == BotMcEasy) ]   [ "McEasy" ]
+            , option_ [ selected_ (model^.modelPlayerBlue == BotMcMedium) ] [ "McMedium" ]
             ]
         ]
     , p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]

@@ -2,7 +2,7 @@
 module Bot.MonteCarlo where
 
 import Control.Monad
-import Control.Monad.State.Strict
+import Control.Monad.State.Lazy
 import System.Random
 
 import Bot.Random
@@ -31,6 +31,16 @@ genMove nSims game =
 -- compute playouts and sum the scores
 computeScore:: (MonadState StdGen m, GameClass game move player) => Int -> player -> game -> m Int
 computeScore nSims player game = sum <$> replicateM nSims (playout player game)
+
+{-
+computeScore:: (MonadState StdGen m, GameClass game move player) => Int -> player -> game -> m Int
+computeScore nSims player game = go nSims 0
+  where
+    go 0 score = pure score
+    go n score = do
+      s <- playout player game
+      go (n - 1) (score + s)
+-}
 
 -- randomly plays a game until the end, then computes its score
 playout :: (MonadState StdGen m, GameClass game move player) => player -> game -> m Int

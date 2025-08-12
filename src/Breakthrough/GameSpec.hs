@@ -5,6 +5,7 @@ import Data.Maybe (fromMaybe)
 import Test.Hspec
 
 import Breakthrough.Game
+import Game
 
 playMoves :: Game -> [Move] -> Game
 playMoves = foldl (\g m -> fromMaybe g $ play m g)
