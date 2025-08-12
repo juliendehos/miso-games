@@ -6,7 +6,7 @@ import System.Random
 
 import Game
 
-genMove :: (MonadState StdGen m) => GameClass game move => game -> m (Maybe move)
+genMove :: (MonadState StdGen m, GameClass game move player) => game -> m (Maybe move)
 genMove game = do
   let moves = getPossibleMoves game
   case moves of

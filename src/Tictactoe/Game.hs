@@ -7,14 +7,9 @@ module Tictactoe.Game
   , Player(..)
   , Status(..)
   , forGame
-  , getCurrentPlayer
-  , getPlayers
-  , getMoves
   , getNiNj
   , getStatus
-  , isRunning
   , mkGame
-  , play
   , reset
   ) where
 
@@ -62,12 +57,23 @@ data Game = Game
 -- export
 -------------------------------------------------------------------------------
 
-instance GameClass Game Move where
-  getPossibleMoves = getMoves
+instance GameClass Game Move Player where
+  getPossibleMoves = _gameMoves
+  getCurrentPlayer = _gameCurrentPlayer
+  isRunning = isRunning'
+  play = play'
 
-play :: Move -> Game -> Maybe Game
-play m@(Move i j) g@Game{..} =
-  if not (isRunning g) || getIJ i j _gameBoard /= CellEmpty
+  scoreForPlayer p Game{..} =
+    case (p, _gameStatus) of
+      (PlayerX, XWins)  ->  1
+      (PlayerX, OWins)  -> -1
+      (PlayerO, OWins)  ->  1
+      (PlayerO, XWins)  -> -1
+      _                 ->  0
+
+play' :: Move -> Game -> Maybe Game
+play' m@(Move i j) g@Game{..} =
+  if not (isRunning' g) || getIJ i j _gameBoard /= CellEmpty
     then Nothing
     else 
       Just $ Game b rm ms s _gameInitialPlayer np
@@ -99,20 +105,11 @@ reset g0 =
         PlayerX -> (PlayerO, OPlays)
         PlayerO -> (PlayerX, XPlays)
 
-getPlayers :: [Player]
-getPlayers = [PlayerX, PlayerO]
-
-getMoves :: Game -> [Move]
-getMoves = _gameMoves
-
 getStatus :: Game -> Status
 getStatus = _gameStatus
 
-getCurrentPlayer :: Game -> Player
-getCurrentPlayer = _gameCurrentPlayer
-
-isRunning :: Game -> Bool
-isRunning Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
+isRunning' :: Game -> Bool
+isRunning' Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame Game{..} = forBoard _gameBoard

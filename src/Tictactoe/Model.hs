@@ -8,14 +8,15 @@ import Miso.Lens
 import Miso.Lens.TH
 import System.Random
 
+import Bot.MonteCarlo
 import Bot.Random
 import Tictactoe.Game
 
 data PlayerType
   = Human
   | BotRandom
-  -- | BotMcEasy   -- TODO
-  -- | BotMcHard
+  | BotMcEasy
+  | BotMcHard
   deriving (Eq)
 
 data Model = Model
@@ -38,8 +39,8 @@ genMovePlayerO = do
   let (move, gen') = case playerType of
           Human -> (Nothing, gen)
           BotRandom -> runState (Bot.Random.genMove game) gen
-          -- BotMcEasy -> TODO
-          -- BotMcHard -> TODO
+          BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
+          BotMcHard -> runState (Bot.MonteCarlo.genMove 500 game) gen
   modelPlayerOGen .= gen'
   pure move
 

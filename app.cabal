@@ -29,7 +29,7 @@ executable app
   main-is:
     Main.hs
   other-modules:
-    -- Bot TODO?
+    Bot.MonteCarlo
     Bot.Random
     Game
     Helpers.Board

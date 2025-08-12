@@ -10,6 +10,7 @@ import Miso.Canvas (Canvas, canvas)
 import Miso.Canvas qualified as Canvas 
 import Miso.Style qualified as Style
 
+import Game
 import Helpers.Canvas
 import Tictactoe.Game
 import Tictactoe.Model
@@ -55,9 +56,12 @@ data Action
 updateModel :: Action -> Effect parentModel Model Action
 
 updateModel (ActionAskPlayerO pt) = do
+  modelLog .= pt <> " plays O"
   case pt of
     "Human"   -> modelPlayerO .= Human
     "Random"  -> modelPlayerO .= BotRandom >> tryPlayBotO
+    "McEasy"  -> modelPlayerO .= BotMcEasy >> tryPlayBotO
+    "McHard"  -> modelPlayerO .= BotMcHard >> tryPlayBotO
     _         -> pure ()
 
 updateModel ActionNewGame = do
@@ -112,8 +116,10 @@ viewModel model =
     [ p_ [] 
         [ text "player O: "
         , select_ [ onChange ActionAskPlayerO ]
-            [ option_ [ selected_ (model^.modelPlayerO == Human) ]  [ "Human" ]
-            , option_ [ selected_ (model^.modelPlayerO == BotRandom) ]   [ "Random" ]
+            [ option_ [ selected_ (model^.modelPlayerO == Human) ]      [ "Human" ]
+            , option_ [ selected_ (model^.modelPlayerO == BotRandom) ]  [ "Random" ]
+            , option_ [ selected_ (model^.modelPlayerO == BotMcEasy) ]  [ "McEasy" ]
+            , option_ [ selected_ (model^.modelPlayerO == BotMcHard) ]  [ "McHard" ]
             ]
         ]
     , p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
@@ -139,7 +145,7 @@ viewModel model =
     canvasWidthD = fromIntegral $ nj*cellSize
     canvasHeightD = fromIntegral $ ni*cellSize
 
-    nbPossibleMoves = model^.modelGame & getMoves & length
+    nbPossibleMoves = model^.modelGame & getPossibleMoves & length
 
     fmtStatus = \case
       XPlays  -> "X plays"
