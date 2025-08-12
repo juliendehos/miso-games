@@ -14,8 +14,8 @@
 
 ## Bots
 
-- [ ] Random
-- [ ] Monte-Carlo
+- [x] Random
+- [x] Monte-Carlo
 
 ## Build and run
 

@@ -6,15 +6,13 @@ module Breakthrough.Game
   , Player(..)
   , Status(..)
   , forGame
-  , getCurrentPlayer
-  , getMoves
   , getMovesFrom
   , getMovesTo
   , getNiNj
   , getStatus
-  , isRunning
   , mkGame
-  , play
+  , moveFrom
+  , moveTo
   , reset
   ) where
 
@@ -22,6 +20,7 @@ import Data.List (nub)
 import Miso.Lens
 import Miso.Lens.TH
 
+import Game
 import Helpers.Board
 
 -------------------------------------------------------------------------------
@@ -71,6 +70,21 @@ makeLenses ''Game
 -- export
 -------------------------------------------------------------------------------
 
+instance GameClass Game Move Player where
+  getPossibleMoves = _gameMoves
+  getCurrentPlayer = _gameCurrentPlayer
+  isRunning = isRunning'
+  play = play'
+
+  scoreForPlayer p g =
+    case (p, g^.gameStatus) of
+      (PlayerRed,  RedWins)   ->  1
+      (PlayerRed,  BlueWins)  -> -1
+      (PlayerBlue, BlueWins)  ->  1
+      (PlayerBlue, RedWins)   -> -1
+      _                       ->  0
+
+
 mkGame :: Int -> Int -> Game
 mkGame ni nj = computeGame ni nj PlayerRed
 
@@ -81,38 +95,8 @@ reset g =
     (g^.gameBoard^.boardNj)
     (if g^.gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
 
-isRunning :: Game -> Bool
-isRunning g = g^.gameStatus == RedPlays || g^.gameStatus == BluePlays
-
-play :: Move -> Game -> Maybe Game
-play m g =
-  if m `elem` g^.gameMoves
-    then
-      let
-        -- apply move
-        cell = g^.gameCurrentPlayer & player2cell
-        board' = g^.gameBoard & setIJs [(m^.moveFrom, CellEmpty), (m^.moveTo, cell)] 
-        -- update status and current player
-        winning = isWinning m g
-        (status', player') =
-          case (winning, g^.gameCurrentPlayer) of
-            (True, PlayerRed)   -> (RedWins, PlayerRed)
-            (True, PlayerBlue)  -> (BlueWins, PlayerBlue)
-            (False, PlayerRed)  -> (BluePlays, PlayerBlue)
-            (False, PlayerBlue) -> (RedPlays, PlayerRed)
-        -- update moves
-        moves' = if winning then [] else computeMoves board' player'
-      in Just $ Game board' status' moves' (g^.gameInitialPlayer) player'
-    else Nothing
-
 getStatus :: Game -> Status
 getStatus = _gameStatus
-
-getMoves :: Game -> [Move]
-getMoves = _gameMoves
-
-getCurrentPlayer :: Game -> Player
-getCurrentPlayer = _gameCurrentPlayer
 
 getMovesFrom :: Game -> [(Int, Int)]
 getMovesFrom g =
@@ -135,6 +119,36 @@ forGame g = forBoard (g^.gameBoard)
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
+
+isRunning' :: Game -> Bool
+isRunning' g = g^.gameStatus == RedPlays || g^.gameStatus == BluePlays
+
+play' :: Move -> Game -> Maybe Game
+play' m g =
+  if m `elem` g^.gameMoves
+    then
+      let
+        -- apply move
+        cell = g^.gameCurrentPlayer & player2cell
+        board' = g^.gameBoard & setIJs [(m^.moveFrom, CellEmpty), (m^.moveTo, cell)] 
+        -- update status and current player
+        winning = isWinning m g
+        (status', player') =
+          case (winning, g^.gameCurrentPlayer) of
+            (True, PlayerRed)   -> (RedWins, PlayerRed)
+            (True, PlayerBlue)  -> (BlueWins, PlayerBlue)
+            (False, PlayerRed)  -> (BluePlays, PlayerBlue)
+            (False, PlayerBlue) -> (RedPlays, PlayerRed)
+        -- update moves
+        moves' = if winning then [] else computeMoves board' player'
+        -- if the next player has no move, the game is over
+        (status'', player'') =
+          case (moves', status') of
+            ([], RedPlays)  -> (BlueWins, PlayerBlue)
+            ([], BluePlays) -> (RedWins, PlayerRed)
+            _               -> (status', player')
+      in Just $ Game board' status'' moves' (g^.gameInitialPlayer) player''
+    else Nothing
 
 mkBoard :: Int -> Int -> Board
 mkBoard ni nj =

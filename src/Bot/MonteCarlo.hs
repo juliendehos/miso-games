@@ -2,7 +2,7 @@
 module Bot.MonteCarlo where
 
 import Control.Monad
-import Control.Monad.State.Lazy
+import Control.Monad.State.Strict
 import System.Random
 
 import Bot.Random

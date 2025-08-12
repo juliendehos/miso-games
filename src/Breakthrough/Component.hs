@@ -9,6 +9,7 @@ import Miso.Canvas (Canvas, canvas)
 import Miso.Canvas qualified as Canvas 
 import Miso.Style qualified as Style
 
+import Game
 import Helpers.Canvas
 import Breakthrough.Game
 import Breakthrough.Model
@@ -40,8 +41,8 @@ ij2xyC = ij2xyC' cellSize cellSize
 
 data Action 
   = ActionAskPlay PointerEvent
+  | ActionAskPlayerBlue MisoString
   | ActionNewGame
-  -- TODO | ActionAskBot
 
 -------------------------------------------------------------------------------
 -- update
@@ -49,13 +50,30 @@ data Action
 
 updateModel :: Action -> Effect parentModel Model Action
 
+updateModel (ActionAskPlayerBlue pt) = do
+  modelSelected .= Nothing
+  modelLog .= pt <> " plays Blue"
+  case pt of
+    "Human"   -> modelPlayerBlue .= Human
+    "Random"  -> modelPlayerBlue .= BotRandom >> tryPlayBotBlue
+    "McEasy"  -> modelPlayerBlue .= BotMcEasy >> tryPlayBotBlue
+    "McHard"  -> modelPlayerBlue .= BotMcHard >> tryPlayBotBlue
+    _         -> pure ()
+
+updateModel ActionNewGame = do
+  modelGame %= Breakthrough.Game.reset
+  modelSelected .= Nothing
+  modelLog .= "new game"
+  tryPlayBotBlue
+
 updateModel (ActionAskPlay event) = do
   game <- use modelGame
   when (isRunning game && button event == 0) $ do
     selected <- use modelSelected
     let ij@(i, j) = uncurry xy2ij $ offset event 
         ijStr = ms (show i <> " " <> show j)
-        playerStr = case game & getCurrentPlayer of
+        player = game & getCurrentPlayer
+        playerStr = case player of
           PlayerRed -> "Red"
           PlayerBlue -> "Blue"
     case selected of
@@ -67,11 +85,9 @@ updateModel (ActionAskPlay event) = do
         modelSelected .= Nothing
         let ij0Str = ms (show i0 <> " " <> show j0)
         if ij `elem` getMovesTo ij0 game
-          then case play (Move ij0 ij) game of
-            Nothing -> modelLog .= playerStr <> " failed to play " <> ij0Str <> " " <> ijStr
-            Just g1 -> do
-              modelGame .= g1
-              modelLog .= playerStr <> " played " <> ij0Str <> " -> " <> ijStr
+          then do
+            doPlay player (Move ij0 ij)
+            tryPlayBotBlue
           else 
             if ij `elem` getMovesFrom game
               then do
@@ -79,10 +95,27 @@ updateModel (ActionAskPlay event) = do
                 modelLog .= playerStr <> " selected " <> ijStr
               else modelLog .= playerStr <> " deselected " <> ij0Str
 
-updateModel ActionNewGame = do
-  modelGame %= Breakthrough.Game.reset
-  modelSelected .= Nothing
-  modelLog .= "new game"
+tryPlayBotBlue :: Effect parentModel Model Action
+tryPlayBotBlue = do
+  game <- use modelGame
+  let player = getCurrentPlayer game
+  when (isRunning game && player == PlayerBlue) $ do
+    mMoveBlue <- genMovePlayerBlue
+    forM_ mMoveBlue (doPlay PlayerBlue)
+
+doPlay :: Player -> Move -> Effect parentModel Model Action
+doPlay player move = do
+  game <- use modelGame
+  let playerStr = case player of
+          PlayerRed -> "Red"
+          PlayerBlue -> "Blue"
+      ij0Str = move ^. moveFrom & show & ms
+      ijStr = move ^. moveTo & show & ms
+  case play move game of
+    Nothing -> modelLog .= playerStr <> " failed to play " <> ij0Str <> " -> " <> ijStr
+    Just game' -> do
+      modelLog .= playerStr <> " played " <> ij0Str <> " -> " <> ijStr
+      modelGame .= game'
 
 -------------------------------------------------------------------------------
 -- view
@@ -94,7 +127,16 @@ cellSizeD = fromIntegral cellSize
 viewModel :: Model -> View parent Action
 viewModel model =
   div_ [] 
-    [ p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
+    [ p_ [] 
+        [ text "player Blue: "
+        , select_ [ onChange ActionAskPlayerBlue ]
+            [ option_ [ selected_ (model^.modelPlayerBlue == Human) ]      [ "Human" ]
+            , option_ [ selected_ (model^.modelPlayerBlue == BotRandom) ]  [ "Random" ]
+            , option_ [ selected_ (model^.modelPlayerBlue == BotMcEasy) ]  [ "McEasy" ]
+            , option_ [ selected_ (model^.modelPlayerBlue == BotMcHard) ]  [ "McHard" ]
+            ]
+        ]
+    , p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
     , canvas 
         [ width_ (ms $ show canvasWidthD)
         , height_ (ms $ show canvasHeightD)

@@ -1,7 +1,7 @@
 
 module Bot.Random where
 
-import Control.Monad.State.Lazy
+import Control.Monad.State.Strict
 import System.Random
 
 import Game

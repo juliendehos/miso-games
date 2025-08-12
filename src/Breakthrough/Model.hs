@@ -2,22 +2,46 @@
 
 module Breakthrough.Model where
 
+import Control.Monad.State.Strict
 import Miso
 import Miso.Lens
 import Miso.Lens.TH
 import System.Random
 
+import Bot.MonteCarlo
+import Bot.Random
 import Breakthrough.Game
 
+data PlayerType
+  = Human
+  | BotRandom
+  | BotMcEasy
+  | BotMcHard
+  deriving (Eq)
+
 data Model = Model
-  { _modelGame      :: Game
-  , _modelSelected  :: Maybe (Int, Int)
-  , _modelLog       :: MisoString
+  { _modelGame          :: Game
+  , _modelSelected      :: Maybe (Int, Int)
+  , _modelLog           :: MisoString
+  , _modelPlayerBlue    :: PlayerType
+  , _modelPlayerBlueGen :: StdGen
   } deriving (Eq)
-  -- TODO _modelGen, _modelBotType
 
 makeLenses ''Model
 
 mkModel :: StdGen -> Model
-mkModel _gen = Model (mkGame 8 8) Nothing "this is Breakthrough"    -- TODO gen BotType
+mkModel = Model (mkGame 8 8) Nothing "this is Breakthrough" Human
+
+genMovePlayerBlue :: MonadState Model m => m (Maybe Move)
+genMovePlayerBlue = do
+  playerType <- use modelPlayerBlue
+  game <- use modelGame
+  gen <- use modelPlayerBlueGen
+  let (move, gen') = case playerType of
+          Human -> (Nothing, gen)
+          BotRandom -> runState (Bot.Random.genMove game) gen
+          BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
+          BotMcHard -> runState (Bot.MonteCarlo.genMove 100 game) gen
+  modelPlayerBlueGen .= gen'
+  pure move
 

@@ -71,21 +71,6 @@ instance GameClass Game Move Player where
       (PlayerO, XWins)  -> -1
       _                 ->  0
 
-play' :: Move -> Game -> Maybe Game
-play' m@(Move i j) g@Game{..} =
-  if not (isRunning' g) || getIJ i j _gameBoard /= CellEmpty
-    then Nothing
-    else 
-      Just $ Game b rm ms s _gameInitialPlayer np
-  where
-    (c, np) = case _gameCurrentPlayer of
-      PlayerX -> (CellX, PlayerO)
-      PlayerO -> (CellO, PlayerX)
-    b = setIJ i j c _gameBoard 
-    rm = _gameRemMoves - 1
-    ms = filter (/=m) _gameMoves
-    s = computeStatus m c b rm
-
 mkGame :: Game
 mkGame = Game board 9 moves XPlays PlayerX PlayerX
   where
@@ -108,9 +93,6 @@ reset g0 =
 getStatus :: Game -> Status
 getStatus = _gameStatus
 
-isRunning' :: Game -> Bool
-isRunning' Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
-
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame Game{..} = forBoard _gameBoard
 
@@ -120,6 +102,24 @@ getNiNj Game{..} = (_boardNi _gameBoard, _boardNj _gameBoard)
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
+
+isRunning' :: Game -> Bool
+isRunning' Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
+
+play' :: Move -> Game -> Maybe Game
+play' m@(Move i j) g@Game{..} =
+  if not (isRunning' g) || getIJ i j _gameBoard /= CellEmpty
+    then Nothing
+    else 
+      Just $ Game b rm ms s _gameInitialPlayer np
+  where
+    (c, np) = case _gameCurrentPlayer of
+      PlayerX -> (CellX, PlayerO)
+      PlayerO -> (CellO, PlayerX)
+    b = setIJ i j c _gameBoard 
+    rm = _gameRemMoves - 1
+    ms = filter (/=m) _gameMoves
+    s = computeStatus m c b rm
 
 computeStatus :: Move -> Cell -> Board -> Int -> Status
 computeStatus (Move i j) c b rm =
