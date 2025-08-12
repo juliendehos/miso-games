@@ -45,6 +45,7 @@ ij2xyC = ij2xyC' cellSize cellSize
 
 data Action 
   = ActionAskPlay PointerEvent
+  | ActionAskPlayerO MisoString
   | ActionNewGame
 
 -------------------------------------------------------------------------------
@@ -53,9 +54,16 @@ data Action
 
 updateModel :: Action -> Effect parentModel Model Action
 
+updateModel (ActionAskPlayerO pt) = do
+  case pt of
+    "Human"   -> modelPlayerO .= Human
+    "Random"  -> modelPlayerO .= BotRandom >> tryPlayBotO
+    _         -> pure ()
+
 updateModel ActionNewGame = do
   modelGame %= Tictactoe.Game.reset
   modelLog .= "new game"
+  tryPlayBotO
 
 updateModel (ActionAskPlay event) = do
   game <- use modelGame
@@ -101,7 +109,14 @@ fmtLogPlay p ok i j =
 viewModel :: Model -> View parent Action
 viewModel model =
   div_ [] 
-    [ p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
+    [ p_ [] 
+        [ text "player O: "
+        , select_ [ onChange ActionAskPlayerO ]
+            [ option_ [ selected_ (model^.modelPlayerO == Human) ]  [ "Human" ]
+            , option_ [ selected_ (model^.modelPlayerO == BotRandom) ]   [ "Random" ]
+            ]
+        ]
+    , p_ [] [ button_ [ onClick ActionNewGame ] [ "new game" ] ]
     , canvas 
         [ width_ (ms $ show canvasWidthD)
         , height_ (ms $ show canvasHeightD)
