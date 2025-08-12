@@ -182,6 +182,8 @@ computeMoves b = \case
       , let c1 = getIJ i1 j1 b
       , c1==cell2 && j1/=j0 || c1==CellEmpty  -- move to an empty cell or capture (diagonaly) an opponent's cell
       ]
+    -- TODO optimize
+    -- TODO use Vector.filter for (i0,j0)?
 
 player2cell :: Player -> Cell
 player2cell = \case

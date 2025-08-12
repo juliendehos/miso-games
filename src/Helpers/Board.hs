@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module Helpers.Board where
+module Helpers.Board where    -- TODO remove this module?
 
 import Miso.Lens
 

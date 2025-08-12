@@ -39,7 +39,7 @@ mkAppModel gen0 =
     tictactoeModel = Tictactoe.mkModel gen3'
 
   in AppModel
-      Breakthrough
+      Tictactoe
       breakthroughModel
       minesweeperModel
       tictactoeModel
