@@ -15,13 +15,3 @@ genMove game = do
       k <- state (uniformR (0, length moves - 1))
       pure $ Just (moves !! k)
 
-{-
-genMove :: GameClass game move => game -> StdGen -> (Maybe move, StdGen)
-genMove game gen = 
-  let moves = getPossibleMoves game
-  in case moves of
-        [] -> (Nothing, gen)
-        _ ->  let (k, gen') = uniformR (0, length moves - 1) gen
-              in (Just (moves !! k), gen')
--}
-
