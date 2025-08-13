@@ -40,8 +40,8 @@ genMovePlayerBlue = do
   let (move, gen') = case playerType of
           Human -> (Nothing, gen)
           BotRandom -> runState (Bot.Random.genMove game) gen
-          BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
-          BotMcMedium -> runState (Bot.MonteCarlo.genMove 100 game) gen
+          BotMcEasy -> runState (Bot.MonteCarlo.genMove 20 game) gen
+          BotMcMedium -> runState (Bot.MonteCarlo.genMove 200 game) gen
   modelPlayerBlueGen .= gen'
   pure move
 

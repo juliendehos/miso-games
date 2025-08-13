@@ -32,7 +32,6 @@ executable app
     Bot.MonteCarlo
     Bot.Random
     Game
-    Helpers.Board
     Helpers.Canvas
     App.Component
     App.Model
@@ -75,8 +74,6 @@ test-suite spec
     vector
   other-modules:
     Game
-    Helpers.Board
-    Helpers.BoardSpec
     Breakthrough.Game
     Breakthrough.GameSpec
     Tictactoe.Game
@@ -102,7 +99,6 @@ executable bench
     vector
   other-modules:
     Game
-    Helpers.Board
     Helpers.TimeIt
     Breakthrough.Game
     Breakthrough.GameBench
