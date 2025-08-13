@@ -21,9 +21,19 @@
 
 Install [Nix Flakes](https://nixos.wiki/wiki/Flakes), then:
 
-```
+```sh
 nix develop .#wasm
+
+# build and run app
+make build && make serve
+
+# test
+make spec
+
+# benchmark
+make bench
+
+# build, test, optimize
 make
-make serve
 ```
 
