@@ -14,6 +14,11 @@ spec:
 	$(eval my_spec=$(shell wasm32-wasi-cabal list-bin spec | tail -n 1))
 	wasmi_cli $(my_spec)
 
+bench:
+	wasm32-wasi-cabal build bench
+	$(eval my_bench=$(shell wasm32-wasi-cabal list-bin bench | tail -n 1))
+	wasmi_cli $(my_bench)
+
 build:
 	wasm32-wasi-cabal build 
 	rm -rf public

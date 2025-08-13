@@ -39,3 +39,5 @@ spec = do
               ]
     it "Red begins, Blue wins" $ getStatus g2 `shouldBe` BlueWins
 
+    -- TODO check victory when a player has no pieces left
+

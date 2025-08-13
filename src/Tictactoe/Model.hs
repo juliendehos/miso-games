@@ -40,7 +40,7 @@ genMovePlayerO = do
           Human -> (Nothing, gen)
           BotRandom -> runState (Bot.Random.genMove game) gen
           BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
-          BotMcHard -> runState (Bot.MonteCarlo.genMove 500 game) gen
+          BotMcHard -> runState (Bot.MonteCarlo.genMove 1_000 game) gen
   modelPlayerOGen .= gen'
   pure move
 

@@ -14,7 +14,7 @@ common options
       -DGHCJS_NEW
   elif arch(wasm32)
     ghc-options:
-      -Wall -no-hs-main -optl-mexec-model=reactor "-optl-Wl,--export=hs_start" -ddump-splices
+      -Wall -O2 -no-hs-main -optl-mexec-model=reactor "-optl-Wl,--export=hs_start" -ddump-splices
     cpp-options:
        -DWASM
   else
@@ -85,4 +85,35 @@ test-suite spec
     GHC2024
   default-extensions:
     CPP TemplateHaskell
- 
+  ghc-options:
+    -Wall -O2
+
+executable bench
+  main-is:
+    Bench.hs
+  hs-source-dirs:
+    src
+  build-depends:
+    base,
+    massiv,
+    miso,
+    mtl,
+    random,
+    vector
+  other-modules:
+    Game
+    Helpers.Board
+    Helpers.TimeIt
+    Breakthrough.Game
+    Breakthrough.GameBench
+    Minesweeper.Game
+    Minesweeper.GameBench
+    Tictactoe.Game
+    Tictactoe.GameBench
+  default-language:
+    GHC2024
+  default-extensions:
+    CPP TemplateHaskell
+  ghc-options:
+    -Wall -O2
+
