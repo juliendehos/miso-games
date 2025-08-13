@@ -109,8 +109,8 @@ doPlay player move = do
   let playerStr = case player of
           PlayerRed -> "Red"
           PlayerBlue -> "Blue"
-      ij0Str = move ^. moveFrom & show & ms
-      ijStr = move ^. moveTo & show & ms
+      ij0Str = ms $ show $ _moveFrom move
+      ijStr = ms $ show $ _moveTo move
   case play move game of
     Nothing -> modelLog .= playerStr <> " failed to play " <> ij0Str <> " -> " <> ijStr
     Just game' -> do

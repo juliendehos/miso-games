@@ -12,15 +12,11 @@ module Breakthrough.Game
   , getNiNj
   , getStatus
   , mkGame
-  , moveFrom
-  , moveTo
   , reset
   ) where
 
 import Data.List (nub)
 import Data.Vector qualified as V
-import Miso.Lens
-import Miso.Lens.TH
 
 import Game
 
@@ -32,8 +28,6 @@ data Move = Move
   { _moveFrom :: (Int, Int)
   , _moveTo   :: (Int, Int)
   } deriving (Eq, Show)
-
-makeLenses ''Move
 
 data Status
   = RedPlays
@@ -65,8 +59,6 @@ data Game = Game
   , _gameCurrentPlayer  :: Player
   } deriving (Eq)
 
-makeLenses ''Game
-
 -------------------------------------------------------------------------------
 -- export
 -------------------------------------------------------------------------------
@@ -77,8 +69,8 @@ instance GameClass Game Move Player where
   isRunning = isRunning'
   play = play'
 
-  scoreForPlayer p g =
-    case (p, g^.gameStatus) of
+  scoreForPlayer p Game{..} =
+    case (p, _gameStatus) of
       (PlayerRed,  RedWins)   ->  1
       (PlayerRed,  BlueWins)  -> -1
       (PlayerBlue, BlueWins)  ->  1
@@ -90,29 +82,23 @@ mkGame :: Int -> Int -> Game
 mkGame ni nj = computeGame ni nj PlayerRed
 
 reset :: Game -> Game
-reset g = 
+reset Game{..} = 
   computeGame 
-    (g^.gameNi)
-    (g^.gameNj)
-    (if g^.gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
+    _gameNi
+    _gameNj
+    (if _gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
 
 getStatus :: Game -> Status
 getStatus = _gameStatus
 
 getMovesFrom :: Game -> [(Int, Int)]
-getMovesFrom g =
-  g^.gameMoves 
-    & map _moveFrom 
-    & nub
+getMovesFrom = nub . map _moveFrom . _gameMoves
 
 getMovesTo :: (Int, Int) -> Game -> [(Int, Int)]
-getMovesTo from g =
-  g^.gameMoves 
-    & filter ((==from) . _moveFrom)
-    & map _moveTo
+getMovesTo from = map _moveTo . filter ((==from) . _moveFrom) . _gameMoves
 
 getNiNj :: Game -> (Int, Int)
-getNiNj g = (g^.gameNi, g^.gameNj)
+getNiNj Game{..} = (_gameNi, _gameNj)
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame Game{..} f = 
@@ -131,33 +117,34 @@ k2ij :: Int -> Int -> (Int, Int)
 k2ij nj k = (k `div` nj, k`rem` nj)
 
 isRunning' :: Game -> Bool
-isRunning' g = g^.gameStatus == RedPlays || g^.gameStatus == BluePlays
+isRunning' Game{..} = _gameStatus == RedPlays || _gameStatus == BluePlays
 
 play' :: Move -> Game -> Maybe Game
-play' m g =
-  if m `elem` g^.gameMoves
+play' m@Move{..} g@Game{..} =
+  if m `elem` _gameMoves
     then
       let
         -- apply move
-        cell = g^.gameCurrentPlayer & player2cell
-        board' = (g^.gameBoard) V.// [(ij2k (g^.gameNj) (m^.moveFrom), CellEmpty), (ij2k (g^.gameNj) (m^.moveTo), cell)]
+        cell = player2cell _gameCurrentPlayer
+        board' = _gameBoard V.// [ (ij2k _gameNj _moveFrom, CellEmpty)
+                                 , (ij2k _gameNj _moveTo, cell) ]
         -- update status and current player
         winning = isWinning m g
         (status', player') =
-          case (winning, g^.gameCurrentPlayer) of
+          case (winning, _gameCurrentPlayer) of
             (True, PlayerRed)   -> (RedWins, PlayerRed)
             (True, PlayerBlue)  -> (BlueWins, PlayerBlue)
             (False, PlayerRed)  -> (BluePlays, PlayerBlue)
             (False, PlayerBlue) -> (RedPlays, PlayerRed)
         -- update moves
-        moves' = if winning then [] else computeMoves board' (g^.gameNi) (g^.gameNj) player'
+        moves' = if winning then [] else computeMoves board' _gameNi _gameNj player'
         -- if the next player has no move, the game is over
         (status'', player'') =
           case (moves', status') of
             ([], RedPlays)  -> (BlueWins, PlayerBlue)
             ([], BluePlays) -> (RedWins, PlayerRed)
             _               -> (status', player')
-      in Just $ Game board' (g^.gameNi) (g^.gameNj) status'' moves' (g^.gameInitialPlayer) player''
+      in Just $ Game board' _gameNi _gameNj status'' moves' _gameInitialPlayer player''
     else Nothing
 
 mkBoard :: Int -> Int -> Board
@@ -197,8 +184,8 @@ player2cell = \case
   PlayerBlue -> CellBlue
 
 isWinning :: Move -> Game -> Bool
-isWinning m g =
-  case g ^. gameCurrentPlayer of
-    PlayerRed -> (m^.moveTo & fst) == 0
-    PlayerBlue -> (m^.moveTo & fst) == (g^.gameNj - 1)
+isWinning Move{..} Game{..} =
+  case _gameCurrentPlayer of
+    PlayerRed -> fst _moveTo == 0
+    PlayerBlue -> fst _moveTo == _gameNj - 1
 
