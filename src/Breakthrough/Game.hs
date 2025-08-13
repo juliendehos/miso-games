@@ -175,22 +175,21 @@ computeGame ni nj p = Game board ni nj status moves p p
 
 computeMoves :: Board -> Int -> Int -> Player -> [Move]
 computeMoves b ni nj = \case
-  PlayerRed -> go CellRed CellBlue (-1)
-  PlayerBlue -> go CellBlue CellRed 1
+  PlayerRed -> V.ifoldl' (f CellRed CellBlue (-1)) [] b
+  PlayerBlue -> V.ifoldl' (f CellBlue CellRed 1) [] b
   where
-    go cell1 cell2 deltaI =
-      [ Move (i0, j0) (i1, j1) 
-      | i0<-[0 .. ni-1]
-      , let i1 = i0 + deltaI
-      , j0<-[0 .. nj-1]
-      , j1<-[j0-1 .. j0+1]
-      , i1>=0 && i1<ni && j1>=0 && j1<nj      -- ij1 is inside the board
-      , b V.! ij2k nj (i0, j0) == cell1                -- ij0 is a current player's cell
-      , let c1 = b V.! ij2k nj (i1, j1)
-      , c1==cell2 && j1/=j0 || c1==CellEmpty  -- move to an empty cell or capture (diagonaly) an opponent's cell
-      ]
-    -- TODO optimize
-    -- TODO use Vector.filter for (i0,j0)?
+    f cell1 cell2 deltaI acc k c =
+      if c /= cell1
+        then acc
+        else
+            [ Move (i0, j0) (i1, j1) 
+            | let (i0, j0) = k2ij nj k
+            , let i1 = i0 + deltaI
+            , j1<-[j0-1 .. j0+1]
+            , i1>=0 && i1<ni && j1>=0 && j1<nj      -- ij1 is inside the board
+            , let c1 = b V.! ij2k nj (i1, j1)
+            , c1==cell2 && j1/=j0 || c1==CellEmpty  -- move to an empty cell or capture (diagonaly) an opponent's cell
+            ] ++ acc
 
 player2cell :: Player -> Cell
 player2cell = \case
