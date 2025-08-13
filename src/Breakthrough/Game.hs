@@ -17,7 +17,7 @@ module Breakthrough.Game
   ) where
 
 import Data.List (nub)
-import Data.Vector qualified as V
+import Data.Vector qualified as V   -- TODO unboxed vector?
 
 import Game
 

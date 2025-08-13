@@ -15,3 +15,12 @@ genMove game = do
       k <- state (uniformR (0, length moves - 1))
       pure $ Just (moves !! k)
 
+genMove' :: (RandomGen gen, GameClass game move player) => game -> gen -> (Maybe move, gen)
+genMove' game gen =
+  case moves of
+    [] -> (Nothing, gen)
+    _ -> (Just (moves !! k), gen')
+  where
+    moves = getPossibleMoves game
+    (k, gen') = uniformR (0, length moves - 1) gen
+  
