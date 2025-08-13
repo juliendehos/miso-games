@@ -20,7 +20,7 @@ bench:
 	wasmi_cli $(my_bench)
 
 build:
-	wasm32-wasi-cabal build 
+	wasm32-wasi-cabal build app
 	rm -rf public
 	cp -r static public
 	$(eval my_wasm=$(shell wasm32-wasi-cabal list-bin app | tail -n 1))

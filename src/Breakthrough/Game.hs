@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 
 module Breakthrough.Game 
   ( Cell(..)
@@ -17,11 +18,11 @@ module Breakthrough.Game
   ) where
 
 import Data.List (nub)
+import Data.Vector qualified as V
 import Miso.Lens
 import Miso.Lens.TH
 
 import Game
-import Helpers.Board
 
 -------------------------------------------------------------------------------
 -- types
@@ -52,12 +53,12 @@ data Player
   | PlayerBlue
   deriving (Eq, Show)
 
-type Board = Board' Cell
-
-makeLenses ''Board
+type Board = V.Vector Cell
 
 data Game = Game
   { _gameBoard          :: Board
+  , _gameNi             :: Int
+  , _gameNj             :: Int
   , _gameStatus         :: Status
   , _gameMoves          :: [Move]   -- possible moves
   , _gameInitialPlayer  :: Player
@@ -91,8 +92,8 @@ mkGame ni nj = computeGame ni nj PlayerRed
 reset :: Game -> Game
 reset g = 
   computeGame 
-    (g^.gameBoard^.boardNi)
-    (g^.gameBoard^.boardNj)
+    (g^.gameNi)
+    (g^.gameNj)
     (if g^.gameInitialPlayer == PlayerRed then PlayerBlue else PlayerRed)
 
 getStatus :: Game -> Status
@@ -111,14 +112,23 @@ getMovesTo from g =
     & map _moveTo
 
 getNiNj :: Game -> (Int, Int)
-getNiNj g = (g^.gameBoard^.boardNi, g^.gameBoard^.boardNj)
+getNiNj g = (g^.gameNi, g^.gameNj)
 
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
-forGame g = forBoard (g^.gameBoard)
+forGame Game{..} f = 
+  V.iforM_ _gameBoard $ \k c -> 
+    let (i, j) = k2ij _gameNj k
+    in f i j c
 
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
+
+ij2k :: Int -> (Int, Int) -> Int
+ij2k nj (i, j) = i*nj + j
+
+k2ij :: Int -> Int -> (Int, Int)
+k2ij nj k = (k `div` nj, k`rem` nj)
 
 isRunning' :: Game -> Bool
 isRunning' g = g^.gameStatus == RedPlays || g^.gameStatus == BluePlays
@@ -130,7 +140,7 @@ play' m g =
       let
         -- apply move
         cell = g^.gameCurrentPlayer & player2cell
-        board' = g^.gameBoard & setIJs [(m^.moveFrom, CellEmpty), (m^.moveTo, cell)] 
+        board' = (g^.gameBoard) V.// [(ij2k (g^.gameNj) (m^.moveFrom), CellEmpty), (ij2k (g^.gameNj) (m^.moveTo), cell)]
         -- update status and current player
         winning = isWinning m g
         (status', player') =
@@ -140,37 +150,34 @@ play' m g =
             (False, PlayerRed)  -> (BluePlays, PlayerBlue)
             (False, PlayerBlue) -> (RedPlays, PlayerRed)
         -- update moves
-        moves' = if winning then [] else computeMoves board' player'
+        moves' = if winning then [] else computeMoves board' (g^.gameNi) (g^.gameNj) player'
         -- if the next player has no move, the game is over
         (status'', player'') =
           case (moves', status') of
             ([], RedPlays)  -> (BlueWins, PlayerBlue)
             ([], BluePlays) -> (RedWins, PlayerRed)
             _               -> (status', player')
-      in Just $ Game board' status'' moves' (g^.gameInitialPlayer) player''
+      in Just $ Game board' (g^.gameNi) (g^.gameNj) status'' moves' (g^.gameInitialPlayer) player''
     else Nothing
 
 mkBoard :: Int -> Int -> Board
 mkBoard ni nj =
-  mkBoardFromList ni nj $
-    replicate (2*nj) CellBlue <>
-    replicate ((ni-4)*nj) CellEmpty <>
-    replicate (2*nj) CellRed
+    V.replicate (2*nj) CellBlue <>
+    V.replicate ((ni-4)*nj) CellEmpty <>
+    V.replicate (2*nj) CellRed
 
 computeGame :: Int -> Int -> Player -> Game
-computeGame ni nj p = Game board status moves p p
+computeGame ni nj p = Game board ni nj status moves p p
   where
     board = mkBoard ni nj
-    moves = computeMoves board p
+    moves = computeMoves board ni nj p
     status = if p == PlayerRed then RedPlays else BluePlays
 
-computeMoves :: Board -> Player -> [Move]
-computeMoves b = \case
+computeMoves :: Board -> Int -> Int -> Player -> [Move]
+computeMoves b ni nj = \case
   PlayerRed -> go CellRed CellBlue (-1)
   PlayerBlue -> go CellBlue CellRed 1
   where
-    ni = b^.boardNi
-    nj = b^.boardNj
     go cell1 cell2 deltaI =
       [ Move (i0, j0) (i1, j1) 
       | i0<-[0 .. ni-1]
@@ -178,8 +185,8 @@ computeMoves b = \case
       , j0<-[0 .. nj-1]
       , j1<-[j0-1 .. j0+1]
       , i1>=0 && i1<ni && j1>=0 && j1<nj      -- ij1 is inside the board
-      , getIJ i0 j0 b == cell1                -- ij0 is a current player's cell
-      , let c1 = getIJ i1 j1 b
+      , b V.! ij2k nj (i0, j0) == cell1                -- ij0 is a current player's cell
+      , let c1 = b V.! ij2k nj (i1, j1)
       , c1==cell2 && j1/=j0 || c1==CellEmpty  -- move to an empty cell or capture (diagonaly) an opponent's cell
       ]
     -- TODO optimize
@@ -194,5 +201,5 @@ isWinning :: Move -> Game -> Bool
 isWinning m g =
   case g ^. gameCurrentPlayer of
     PlayerRed -> (m^.moveTo & fst) == 0
-    PlayerBlue -> (m^.moveTo & fst) == (g^.gameBoard^.boardNj - 1)
+    PlayerBlue -> (m^.moveTo & fst) == (g^.gameNj - 1)
 
