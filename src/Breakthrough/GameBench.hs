@@ -1,10 +1,9 @@
 
 module Breakthrough.GameBench (run) where
 
-import Helpers.TimeIt (myTimeIt)
-
-import Game
 import Breakthrough.Game
+import Game
+import Helpers.TimeIt (myTimeIt)
 
 run :: IO ()
 run = do

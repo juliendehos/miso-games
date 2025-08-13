@@ -73,9 +73,9 @@ test-suite spec
     random,
     vector
   other-modules:
-    Game
     Breakthrough.Game
     Breakthrough.GameSpec
+    Game
     Tictactoe.Game
     Tictactoe.GameSpec
   default-language:
@@ -98,10 +98,13 @@ executable bench
     random,
     vector
   other-modules:
-    Game
-    Helpers.TimeIt
+    Bot.MonteCarlo
+    Bot.MonteCarloBench
+    Bot.Random
     Breakthrough.Game
     Breakthrough.GameBench
+    Game
+    Helpers.TimeIt
     Minesweeper.Game
     Minesweeper.GameBench
     Tictactoe.Game

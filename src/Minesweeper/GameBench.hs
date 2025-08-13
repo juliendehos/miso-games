@@ -5,7 +5,6 @@ import Control.Monad.ST
 import System.Random.Stateful
 
 import Helpers.TimeIt (myTimeIt)
-
 import Minesweeper.Game
 
 run :: IO ()
