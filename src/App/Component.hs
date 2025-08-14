@@ -21,10 +21,11 @@ newtype Action
 updateModel :: Action -> Transition AppModel Action
 updateModel (ActionAskGame gt) = do
   case gt of
-    "Breakthrough"  -> modelGameType .= Breakthrough
-    "Minesweeper"   -> modelGameType .= Minesweeper
-    "Tictactoe"     -> modelGameType .= Tictactoe
-    _               -> pure ()
+    "Breakthrough"      -> modelGameType .= Breakthrough
+    "Breakthrough 8x6"  -> modelGameType .= Breakthrough86
+    "Minesweeper"       -> modelGameType .= Minesweeper
+    "Tictactoe"         -> modelGameType .= Tictactoe
+    _                   -> pure ()
 
 -------------------------------------------------------------------------------
 -- View
@@ -36,9 +37,10 @@ viewModel model =
     [ p_ [] 
         [ text "game: "
         , select_ [ onChange ActionAskGame ]
-            [ option_ [ selected_ (model^.modelGameType == Breakthrough) ]  [ "Breakthrough" ]
-            , option_ [ selected_ (model^.modelGameType == Minesweeper) ]   [ "Minesweeper" ]
-            , option_ [ selected_ (model^.modelGameType == Tictactoe) ]     [ "Tictactoe" ]
+            [ option_ [ selected_ (model^.modelGameType == Breakthrough) ]    [ "Breakthrough" ]
+            , option_ [ selected_ (model^.modelGameType == Breakthrough86) ]  [ "Breakthrough 8x6" ]
+            , option_ [ selected_ (model^.modelGameType == Minesweeper) ]     [ "Minesweeper" ]
+            , option_ [ selected_ (model^.modelGameType == Tictactoe) ]       [ "Tictactoe" ]
             ]
         ]
     , gameDiv
@@ -54,6 +56,13 @@ viewModel model =
           , div_ [ key_ ("Breakthrough"::MisoString) ] +> 
               (model^.modelBreakthrough & Breakthrough.mkComponent)
                 { bindings = [ modelBreakthrough <--> this ] }
+          ]
+      Breakthrough86 -> 
+        div_ []
+          [ fmtInfo "Breakthrough 8x6" "https://en.wikipedia.org/wiki/Breakthrough_(board_game)"
+          , div_ [ key_ ("Breakthrough86"::MisoString) ] +> 
+              (model^.modelBreakthrough86 & Breakthrough.mkComponent)
+                { bindings = [ modelBreakthrough86 <--> this ] }
           ]
       Minesweeper -> 
         div_ []

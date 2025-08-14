@@ -38,9 +38,12 @@ genMovePlayerO = do
   gen <- use modelPlayerOGen
   let (move, gen') = case playerType of
           Human -> (Nothing, gen)
-          BotRandom -> runState (Bot.Random.genMove game) gen
-          BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
-          BotMcHard -> runState (Bot.MonteCarlo.genMove 5_000 game) gen
+          BotRandom -> Bot.Random.genMove' game gen
+          BotMcEasy -> Bot.MonteCarlo.genMove' 10 game gen
+          BotMcHard -> Bot.MonteCarlo.genMove' 5_000 game gen
+          -- BotRandom -> runState (Bot.Random.genMove game) gen
+          -- BotMcEasy -> runState (Bot.MonteCarlo.genMove 10 game) gen
+          -- BotMcHard -> runState (Bot.MonteCarlo.genMove 5_000 game) gen
   modelPlayerOGen .= gen'
   pure move
 

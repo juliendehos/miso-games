@@ -29,8 +29,10 @@ data Model = Model
 
 makeLenses ''Model
 
-mkModel :: StdGen -> Model
-mkModel = Model (mkGame 8 8) Nothing "this is Breakthrough" Human
+mkModel :: Int -> Int -> StdGen -> Model
+mkModel ni nj = Model (mkGame ni nj) Nothing msg Human
+  where
+    msg = ms $ "this is Breakthrough " <> show ni <> "x" <> show nj
 
 genMovePlayerBlue :: MonadState Model m => m (Maybe Move)
 genMovePlayerBlue = do
@@ -40,9 +42,10 @@ genMovePlayerBlue = do
   let (move, gen') = case playerType of
           Human -> (Nothing, gen)
           BotRandom -> Bot.Random.genMove' game gen
+          BotMcEasy -> Bot.MonteCarlo.genMove' 30 game gen
+          BotMcMedium -> Bot.MonteCarlo.genMove' 300 game gen
           -- BotRandom -> runState (Bot.Random.genMove game) gen
-          BotMcEasy -> runState (Bot.MonteCarlo.genMove 20 game) gen
-          BotMcMedium -> Bot.MonteCarlo.genMove' 500 game gen
+          -- BotMcEasy -> runState (Bot.MonteCarlo.genMove 20 game) gen
           -- BotMcMedium -> runState (Bot.MonteCarlo.genMove 200 game) gen
   modelPlayerBlueGen .= gen'
   pure move

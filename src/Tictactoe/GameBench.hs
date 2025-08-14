@@ -1,15 +1,22 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Tictactoe.GameBench (run) where
 
-import Helpers.TimeIt (myTimeIt)
+import Control.Monad
 
 import Game
+import Helpers.TimeIt
 import Tictactoe.Game
+
+instance Show Tictactoe.Game.Game where
+  show _ = "Tictactoe.Game"
 
 run :: IO ()
 run = do
-  let g = mkGame
-  myTimeIt "Tictactoe, mkGame" g
-  myTimeIt "Tictactoe, reset" $ reset g   -- doesn't recompute g
-  myTimeIt "Tictactoe, play" $ play (Move 1 1) g
+
+  (_, game) <- myTimeIt "Tictactoe, mkGame" mkGame
+
+  void $ myTimeIt "Tictactoe, reset" $ reset game
+
+  void $ myTimeIt "Tictactoe, play" $ play (Move 1 1) game
 

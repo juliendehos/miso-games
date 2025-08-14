@@ -3,12 +3,21 @@
 
 module Helpers.TimeIt where
 
+import Control.Monad.IO.Class
 import System.CPUTime
 import Text.Printf
-import Control.Monad.IO.Class (MonadIO(liftIO))
 
+myTimeIt :: Show a => String -> a -> IO (Double, a)
+myTimeIt msg f = do
+  putStrLn $ "\n*** " <> msg <> " ***"
+  r@(t, _) <- timeItT $ let y = f in y `seq` putStrLn ("result: " <> show y) >> pure y
+  printf "time: %6.6fs\n" t
+  pure r
+
+{-
 myTimeIt :: MonadIO m => String -> a -> m ()
 myTimeIt name f = timeItNamed name $ f `seq` pure ()
+-}
 
 -- | Wrap a 'MonadIO' computation so that it prints out the execution time.
 timeIt :: MonadIO m => m a -> m a

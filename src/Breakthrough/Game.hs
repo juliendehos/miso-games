@@ -188,5 +188,5 @@ isWinning :: Move -> Game -> Bool
 isWinning Move{..} Game{..} =
   case _gameCurrentPlayer of
     PlayerRed -> fst _moveTo == 0
-    PlayerBlue -> fst _moveTo == _gameNj - 1
+    PlayerBlue -> fst _moveTo == _gameNi - 1
 
