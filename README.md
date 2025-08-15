@@ -28,12 +28,20 @@ nix develop .#wasm
 make build && make serve
 
 # test
-make spec
+make test
 
 # benchmark
-make bench
+make time
 
 # build, test, optimize
 make
+```
+
+test/bench using ghc:
+
+```sh
+nix develop .#default
+cabal test
+cabal bench
 ```
 

@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Bot.MonteCarloBench (run) where
+module Bot.MonteCarloTime (run) where
 
 import Control.Monad
 import Control.Monad.State.Strict

@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Breakthrough.GameBench (run) where
+module Breakthrough.GameTime (run) where
 
 import Control.Monad
 

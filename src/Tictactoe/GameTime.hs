@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Tictactoe.GameBench (run) where
+module Tictactoe.GameTime (run) where
 
 import Control.Monad
 

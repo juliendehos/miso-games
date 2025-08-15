@@ -58,7 +58,7 @@ executable app
   default-extensions:
     CPP TemplateHaskell
 
-test-suite spec
+test-suite test
   main-is:
     Spec.hs
   hs-source-dirs:
@@ -85,9 +85,9 @@ test-suite spec
   ghc-options:
     -Wall -O2
 
-executable bench
+executable time
   main-is:
-    Bench.hs
+    Time.hs
   hs-source-dirs:
     src
   build-depends:
@@ -99,16 +99,16 @@ executable bench
     vector
   other-modules:
     Bot.MonteCarlo
-    Bot.MonteCarloBench
+    Bot.MonteCarloTime
     Bot.Random
     Breakthrough.Game
-    Breakthrough.GameBench
+    Breakthrough.GameTime
     Game
     Helpers.TimeIt
     Minesweeper.Game
-    Minesweeper.GameBench
+    Minesweeper.GameTime
     Tictactoe.Game
-    Tictactoe.GameBench
+    Tictactoe.GameTime
   default-language:
     GHC2024
   default-extensions:

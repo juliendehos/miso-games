@@ -1,7 +1,7 @@
 
-.PHONY= update build optim spec todo
+.PHONY= update build optim test todo
 
-all: clean update spec build optim
+all: clean update test build optim
 
 update:
 	wasm32-wasi-cabal update
@@ -9,15 +9,15 @@ update:
 todo:
 	find src -name "*.hs" | xargs grep -i todo
 
-spec:
-	wasm32-wasi-cabal build spec
-	$(eval my_spec=$(shell wasm32-wasi-cabal list-bin spec | tail -n 1))
+test:
+	wasm32-wasi-cabal build test
+	$(eval my_spec=$(shell wasm32-wasi-cabal list-bin test | tail -n 1))
 	wasmi_cli $(my_spec)
 
-bench:
-	wasm32-wasi-cabal build bench
-	$(eval my_bench=$(shell wasm32-wasi-cabal list-bin bench | tail -n 1))
-	wasmi_cli $(my_bench)
+time:
+	wasm32-wasi-cabal build time
+	$(eval my_time=$(shell wasm32-wasi-cabal list-bin time | tail -n 1))
+	wasmi_cli $(my_time)
 
 build:
 	wasm32-wasi-cabal build app

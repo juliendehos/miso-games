@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module Minesweeper.GameBench (run) where
+module Minesweeper.GameTime (run) where
 
 import Control.Monad
 import Control.Monad.ST
