@@ -42,6 +42,8 @@ test/bench using ghc:
 ```sh
 nix develop .#default
 cabal test
+cabal run time
 cabal bench
+$(cabal list-bin criterion | tail -n 1) --output bench.html
 ```
 

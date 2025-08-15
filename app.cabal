@@ -116,3 +116,36 @@ executable time
   ghc-options:
     -Wall -O2
 
+benchmark criterion
+  type:
+    exitcode-stdio-1.0
+  main-is:
+    Bench.hs
+  hs-source-dirs:
+    src
+  build-depends:
+    base,
+    criterion,
+    massiv,
+    miso,
+    mtl,
+    random,
+    vector
+  other-modules:
+    Bot.MonteCarlo
+    Bot.MonteCarloBench
+    Bot.Random
+    Breakthrough.Game
+    Breakthrough.GameBench
+    Game
+    Minesweeper.Game
+    Minesweeper.GameBench
+    Tictactoe.Game
+    Tictactoe.GameBench
+  default-language:
+    GHC2024
+  default-extensions:
+    CPP TemplateHaskell
+  ghc-options:
+    -Wall -O2
+
