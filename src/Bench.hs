@@ -1,17 +1,17 @@
 
 import Criterion.Main
 
-import Bot.MonteCarloBench
 import Breakthrough.GameBench
+import Bot.MonteCarloBench
 import Minesweeper.GameBench
 import Tictactoe.GameBench
 
 main :: IO ()
-main = 
-  defaultMain 
-    (  Bot.MonteCarloBench.groups
-    <> Breakthrough.GameBench.groups
-    <> Minesweeper.GameBench.groups
-    <> Tictactoe.GameBench.groups
-    )
+main =
+  defaultMain . concat =<< sequence 
+    [ Breakthrough.GameBench.mkGroups
+    , Bot.MonteCarloBench.mkGroups
+    , Minesweeper.GameBench.mkGroups 
+    , Tictactoe.GameBench.mkGroups
+    ]
 

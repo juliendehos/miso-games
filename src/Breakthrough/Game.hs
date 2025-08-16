@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
@@ -19,6 +21,9 @@ module Breakthrough.Game
 import Data.List (nub)
 import Data.Vector qualified as V   -- TODO unboxed vector?
 
+import GHC.Generics (Generic)
+import Control.DeepSeq
+
 import Game
 
 -------------------------------------------------------------------------------
@@ -28,7 +33,7 @@ import Game
 data Move = Move
   { _moveFrom :: (Int, Int)
   , _moveTo   :: (Int, Int)
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic, NFData)
 
 data Status
   = RedPlays

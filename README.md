@@ -44,6 +44,8 @@ nix develop .#default
 cabal test
 cabal run time
 cabal bench
-$(cabal list-bin criterion | tail -n 1) --output bench.html
+cabal build criterion && $(cabal list-bin criterion | tail -n 1) --output bench.html
+$(cabal list-bin criterion | tail -n 1) --list
+$(cabal list-bin criterion | tail -n 1) "Breakthrough.Game/play"
 ```
 

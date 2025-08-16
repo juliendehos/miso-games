@@ -47,6 +47,7 @@ executable app
   build-depends:
     base,
     containers,
+    deepseq,
     massiv,
     miso,
     mtl,
@@ -67,6 +68,7 @@ test-suite test
     exitcode-stdio-1.0
   build-depends:
     base,
+    deepseq,
     hspec,
     miso,
     mtl,
@@ -92,6 +94,7 @@ executable time
     src
   build-depends:
     base,
+    deepseq,
     massiv,
     miso,
     mtl,
@@ -126,6 +129,7 @@ benchmark criterion
   build-depends:
     base,
     criterion,
+    deepseq,
     massiv,
     miso,
     mtl,

@@ -1,17 +1,27 @@
 
-module Bot.MonteCarloBench (groups) where
+module Bot.MonteCarloBench (mkGroups) where
 
+import Control.Monad.State.Strict
 import Criterion.Main
+import System.Random
 
-fib m | m < 0     = error "negative!"
-      | otherwise = go m
-  where go 0 = 0
-        go 1 = 1
-        go n = go (n-1) + go (n-2)
+import Breakthrough.Game
+import Bot.MonteCarlo
 
-groups = 
-  [ bgroup "montecarlo fib" 
-      [ bench "1"  $ whnf fib 1
-      ]
-  ]
+mkGroups :: IO [Benchmark]
+mkGroups = do
+  gen <- getStdGen
+  let game = Breakthrough.Game.mkGame 8 8
+  pure 
+    [ bgroup "MonteCarlo Breakthrough" 
+        [ bench "genMove' 2" $ 
+            nf (Bot.MonteCarlo.genMove' 2 game) gen
+        , bench "genMove 2" $ 
+            whnf (runState (Bot.MonteCarlo.genMove 2 game)) gen
+        , bench "genMove' 5" $ 
+            nf (Bot.MonteCarlo.genMove' 5 game) gen
+        , bench "genMove 5" $ 
+            whnf (runState (Bot.MonteCarlo.genMove 5 game)) gen
+        ]
+    ]
 
