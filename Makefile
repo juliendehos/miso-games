@@ -35,5 +35,5 @@ serve:
 	http-server public
 
 clean:
-	rm -rf dist-newstyle public
+	rm -rf dist-newstyle public bench.html
 
