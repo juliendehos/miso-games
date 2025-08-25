@@ -8,7 +8,10 @@ import Miso
 import Miso.Lens
 import Miso.Canvas (Canvas, canvas)
 import Miso.Canvas qualified as Canvas 
-import Miso.Style qualified as Style
+import Miso.CSS qualified as CSS
+import Miso.Html.Element as H
+import Miso.Html.Event as E
+import Miso.Html.Property as P
 
 import Game
 import Helpers.Canvas
@@ -19,10 +22,10 @@ import Tictactoe.Model
 -- view params
 -------------------------------------------------------------------------------
 
-bgColor, bgColorEnd, fgColor :: Style.Color
-bgColor = Style.Hex "88DD88"
-bgColorEnd = Style.Hex "DDDDDD"
-fgColor = Style.red
+bgColor, bgColorEnd, fgColor :: CSS.Color
+bgColor = CSS.hex 0x88DD88
+bgColorEnd = CSS.hex 0xDDDDDD
+fgColor = CSS.red
 
 cellSize :: Int
 cellSize = 100
@@ -126,7 +129,7 @@ viewModel model =
     , canvas 
         [ width_ (ms $ show canvasWidthD)
         , height_ (ms $ show canvasHeightD)
-        , Style.style_  [Style.border "2px solid black"]
+        , CSS.style_  [CSS.border "2px solid black"]
         , onPointerUp ActionAskPlay
         ]
       initCanvas
@@ -141,7 +144,7 @@ viewModel model =
     ]
 
   where
-    (ni, nj) = model^.modelGame & getNiNj
+    (ni, nj) = getNiNj
     canvasWidthD = fromIntegral $ nj*cellSize
     canvasHeightD = fromIntegral $ ni*cellSize
 
@@ -162,10 +165,10 @@ drawCanvas ni nj canvasWidthD canvasHeightD model () = do
   Canvas.clearRect (0, 0, canvasWidthD, canvasHeightD)
   let bg = if model^.modelGame & isRunning then bgColor else bgColorEnd
   drawBackground bg canvasWidthD canvasHeightD
-  drawGrid Style.black nj ni cellSize cellSize canvasWidthD canvasHeightD
+  drawGrid CSS.black nj ni cellSize cellSize canvasWidthD canvasHeightD
   forGame (model^.modelGame) (drawGameCell bg)
 
-drawGameCell :: Style.Color -> Int -> Int -> Cell -> Canvas ()
+drawGameCell :: CSS.Color -> Int -> Int -> Cell -> Canvas ()
 drawGameCell bg i j = \case
   CellX -> drawX i j
   CellO -> drawO bg i j
@@ -189,7 +192,7 @@ drawX i j = do
   Canvas.fillRect (-cs005, -cs04, cs01, cs08)
   Canvas.restore ()
 
-drawO :: Style.Color -> Int -> Int -> Canvas ()
+drawO :: CSS.Color -> Int -> Int -> Canvas ()
 drawO bg i j = do
 
   Canvas.save ()

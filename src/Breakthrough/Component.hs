@@ -7,7 +7,10 @@ import Miso
 import Miso.Lens
 import Miso.Canvas (Canvas, canvas)
 import Miso.Canvas qualified as Canvas 
-import Miso.Style qualified as Style
+import Miso.CSS qualified as CSS
+import Miso.Html.Element as H
+import Miso.Html.Event as E
+import Miso.Html.Property as P
 
 import Game
 import Helpers.Canvas
@@ -18,9 +21,9 @@ import Breakthrough.Model
 -- view params
 -------------------------------------------------------------------------------
 
-bgColor, bgColorEnd :: Style.Color
-bgColor = Style.Hex "88DD88"
-bgColorEnd = Style.Hex "DDDDDD"
+bgColor, bgColorEnd :: CSS.Color
+bgColor = CSS.hex 0x88DD88
+bgColorEnd = CSS.hex 0xDDDDDD
 
 cellSize :: Int
 cellSize = 50
@@ -140,7 +143,7 @@ viewModel model =
     , canvas 
         [ width_ (ms $ show canvasWidthD)
         , height_ (ms $ show canvasHeightD)
-        , Style.style_  [Style.border "2px solid black"]
+        , CSS.style_  [CSS.border "2px solid black"]
         , onPointerUp ActionAskPlay
         ]
       initCanvas
@@ -171,7 +174,7 @@ drawCanvas ni nj canvasWidthD canvasHeightD model () = do
   Canvas.clearRect (0, 0, canvasWidthD, canvasHeightD)
   let bg = if model^.modelGame & isRunning then bgColor else bgColorEnd
   drawBackground bg canvasWidthD canvasHeightD
-  drawGrid Style.black ni nj cellSize cellSize canvasWidthD canvasHeightD
+  drawGrid CSS.black ni nj cellSize cellSize canvasWidthD canvasHeightD
   drawMoves model
   forGame (model^.modelGame) drawGameCell 
 
@@ -180,20 +183,20 @@ drawMoves model =
   case model^.modelSelected of
     Nothing -> 
       forM_ (model^.modelGame & getMovesFrom) $ 
-        uncurry (drawDisc Style.white cs045)
+        uncurry (drawDisc CSS.white cs045)
     Just ij0@(i0, j0) -> do
-      drawDisc Style.black cs045 i0 j0
+      drawDisc CSS.black cs045 i0 j0
       forM_ (model^.modelGame & getMovesTo ij0) $ \(i1, j1) -> do
-        drawDisc Style.white cs045 i1 j1
+        drawDisc CSS.white cs045 i1 j1
         drawDisc bgColor cs04 i1 j1
 
 drawGameCell :: Int -> Int -> Cell -> Canvas ()
 drawGameCell i j = \case
-  CellRed   -> drawDisc Style.red cs04 i j
-  CellBlue  -> drawDisc Style.blue cs04 i j
+  CellRed   -> drawDisc CSS.red cs04 i j
+  CellBlue  -> drawDisc CSS.blue cs04 i j
   _ -> pure ()
 
-drawDisc :: Style.Color -> Double -> Int -> Int -> Canvas ()
+drawDisc :: CSS.Color -> Double -> Int -> Int -> Canvas ()
 drawDisc col rad i j = do
   Canvas.save ()
   Canvas.translate $ ij2xyC i j

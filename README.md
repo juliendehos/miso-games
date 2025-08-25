@@ -9,7 +9,7 @@
 
 - [x] [Tic-tac-toe](https://en.wikipedia.org/wiki/Tic-tac-toe)
 - [x] [Breakthrough](https://en.wikipedia.org/wiki/Breakthrough_(board_game))
-- [ ] [Gomoku](https://en.wikipedia.org/wiki/Gomoku)
+- [ ] [Connect Four](https://en.wikipedia.org/wiki/Connect_Four)
 - [ ] [Reversi/Othello](https://en.wikipedia.org/wiki/Reversi)
 
 ## Bots

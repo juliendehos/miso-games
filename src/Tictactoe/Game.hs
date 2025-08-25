@@ -48,8 +48,6 @@ data Move = Move Int Int
 
 data Game = Game
   { _gameBoard          :: Board
-  , _gameNi             :: Int
-  , _gameNj             :: Int
   , _gameRemMoves       :: Int
   , _gameMoves          :: [Move]
   , _gameStatus         :: Status
@@ -76,7 +74,7 @@ instance GameClass Game Move Player where
       _                 ->  0
 
 mkGame :: Game
-mkGame = Game board 3 3 9 moves XPlays PlayerX PlayerX
+mkGame = Game board 9 moves XPlays PlayerX PlayerX
   where
     board = V.replicate 9 CellEmpty 
     moves = [ Move i j | i<-[0..2], j<-[0..2] ]
@@ -100,42 +98,42 @@ getStatus = _gameStatus
 forGame :: (Monad m) => Game -> (Int -> Int -> Cell -> m ()) -> m ()
 forGame Game{..} f = 
   V.iforM_ _gameBoard $ \k c -> 
-    let (i, j) = k2ij _gameNj k
+    let (i, j) = k2ij k
     in f i j c
 
-getNiNj :: Game -> (Int, Int)
-getNiNj Game{..} = (_gameNi, _gameNj)
+getNiNj :: (Int, Int)
+getNiNj = (3, 3)
 
 -------------------------------------------------------------------------------
 -- internal
 -------------------------------------------------------------------------------
 
-ij2k :: Int -> (Int, Int) -> Int
-ij2k nj (i, j) = i*nj + j
+ij2k :: (Int, Int) -> Int
+ij2k (i, j) = i*3 + j
 
-k2ij :: Int -> Int -> (Int, Int)
-k2ij nj k = (k `div` nj, k`rem` nj)
+k2ij :: Int -> (Int, Int)
+k2ij k = (k `div` 3, k`rem` 3)
 
 isRunning' :: Game -> Bool
 isRunning' Game{..} = _gameStatus == XPlays || _gameStatus == OPlays
 
 play' :: Move -> Game -> Maybe Game
 play' m@(Move i j) g@Game{..} =
-  if not (isRunning' g) ||_gameBoard V.! ij2k _gameNj (i, j) /= CellEmpty
+  if not (isRunning' g) ||_gameBoard V.! ij2k (i, j) /= CellEmpty
     then Nothing
     else 
-      Just $ Game board _gameNi _gameNj remMoves moves status _gameInitialPlayer nextPlayer
+      Just $ Game board remMoves moves status _gameInitialPlayer nextPlayer
   where
     (cell, nextPlayer) = case _gameCurrentPlayer of
       PlayerX -> (CellX, PlayerO)
       PlayerO -> (CellO, PlayerX)
-    board = _gameBoard V.// [(ij2k _gameNj (i, j), cell)]
+    board = _gameBoard V.// [(ij2k (i, j), cell)]
     remMoves = _gameRemMoves - 1
     moves = filter (/=m) _gameMoves
-    status = computeStatus m cell board _gameNj remMoves
+    status = computeStatus m cell board remMoves
 
-computeStatus :: Move -> Cell -> Board -> Int -> Int -> Status
-computeStatus (Move i j) cell b nj remMoves =
+computeStatus :: Move -> Cell -> Board -> Int -> Status
+computeStatus (Move i j) cell b remMoves =
   case (win, cell, remMoves) of
     (True, CellX, _)  -> XWins
     (True, CellO, _)  -> OWins
@@ -143,7 +141,7 @@ computeStatus (Move i j) cell b nj remMoves =
     (False, CellX, _) -> OPlays
     _                 -> XPlays
   where
-    f i' j' = b V.! ij2k nj (i', j') == cell
+    f i' j' = b V.! ij2k (i', j') == cell
     win = f i 0 && f i 1 && f i 2 ||
           f 0 j && f 1 j && f 2 j ||
           f 0 0 && f 1 1 && f 2 2 ||

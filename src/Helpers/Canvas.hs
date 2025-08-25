@@ -3,7 +3,7 @@ module Helpers.Canvas where
 
 import Control.Monad (forM_)
 import Miso.Canvas as Canvas
-import Miso.Style as Style
+import Miso.CSS as CSS
 
 drawBackground :: Color -> Double -> Double -> Canvas ()
 drawBackground c w h = do

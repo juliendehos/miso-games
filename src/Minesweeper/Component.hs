@@ -7,7 +7,10 @@ import Control.Monad.IO.Class (liftIO)
 import Miso
 import Miso.Canvas as Canvas
 import Miso.Lens
-import Miso.Style qualified as Style
+import Miso.CSS qualified as CSS
+import Miso.Html.Element as H
+import Miso.Html.Event as E
+import Miso.Html.Property as P
 
 import Helpers.Canvas
 import Minesweeper.Game
@@ -23,20 +26,20 @@ cellSize = 25
 cellFont :: MisoString
 cellFont = "small-caps bold 18px arial"
 
-colorNo, colorYes, colorWrongFlag, colorWrongMine :: Style.Color
-colorNo = Style.Hex "BBBBBB"
-colorYes = Style.Hex "DDDDDD"
-colorWrongFlag = Style.Hex "88DD88"
-colorWrongMine = Style.Hex "DD8888"
+colorNo, colorYes, colorWrongFlag, colorWrongMine :: CSS.Color
+colorNo = CSS.hex 0xBBBBBB
+colorYes = CSS.hex 0xDDDDDD
+colorWrongFlag = CSS.hex 0x88DD88
+colorWrongMine = CSS.hex 0xDD8888
 
-n2color :: Int -> Style.Color
+n2color :: Int -> CSS.Color
 n2color = \case
-  1 -> Style.Hex "0000FF"
-  2 -> Style.Hex "007B00"
-  3 -> Style.Hex "FF0000"
-  4 -> Style.Hex "00007B"
-  5 -> Style.Hex "7B0000"
-  _ -> Style.black
+  1 -> CSS.hex 0x0000FF
+  2 -> CSS.hex 0x007B00
+  3 -> CSS.hex 0xFF0000
+  4 -> CSS.hex 0x00007B
+  5 -> CSS.hex 0x7B0000
+  _ -> CSS.black
 
 -------------------------------------------------------------------------------
 -- helpers
@@ -111,7 +114,7 @@ viewModel model = div_ []
   , Canvas.canvas 
       [ width_ (ms $ nj * cellSize)
       , height_ (ms $ ni * cellSize)
-      , Style.style_  [Style.border "2px solid black"]
+      , CSS.style_  [CSS.border "2px solid black"]
       , onPointerUp ActionAskPlay
       , onContextMenuWithOptions ActionNone (defaultOptions { preventDefault = True })
       ]
@@ -149,9 +152,9 @@ drawCanvas model () = do
   font cellFont
   drawBackground colorNo w h
   forGame (model ^. modelGame) drawGameCell
-  drawGrid Style.black ni nj cellSize cellSize w h
+  drawGrid CSS.black ni nj cellSize cellSize w h
 
-drawCell :: Style.Color -> Canvas ()
+drawCell :: CSS.Color -> Canvas ()
 drawCell c = do
   fillStyle (color c)
   fillRect (0, 0, cellSizeD, cellSizeD)
@@ -175,12 +178,12 @@ drawMine wrong i j = do
   lineTo (cs09, cs05)
   stroke ()
 
-  fillStyle (color Style.black)
+  fillStyle (color CSS.black)
   beginPath ()
   arc (cs05, cs05, cs03, 0, 2*pi)
   fill ()
 
-  fillStyle (color Style.white)
+  fillStyle (color CSS.white)
   beginPath ()
   arc (cs04, cs04, cs007, 0, 2*pi)
   fill ()
@@ -195,7 +198,7 @@ drawFlag wrong i j = do
 
   when wrong $ drawCell colorWrongFlag
 
-  fillStyle (color Style.red)
+  fillStyle (color CSS.red)
   beginPath ()
   moveTo (cs02, cs04)
   lineTo (cs06, cs02)
@@ -203,7 +206,7 @@ drawFlag wrong i j = do
   closePath ()
   fill ()
 
-  fillStyle (color Style.black)
+  fillStyle (color CSS.black)
   fillRect (cs06, cs02, cs01, cs06)
 
   restore ()

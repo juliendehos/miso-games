@@ -5,6 +5,9 @@ module App.Component where
 import Miso
 
 import Miso.Lens
+import Miso.Html.Element as H
+import Miso.Html.Event as E
+import Miso.Html.Property as P
 
 import App.Model
 import Breakthrough.Component as Breakthrough
