@@ -38,6 +38,9 @@ executable app
     Breakthrough.Component
     Breakthrough.Game
     Breakthrough.Model
+    ConnectFour.Component
+    ConnectFour.Game
+    ConnectFour.Model
     Minesweeper.Component
     Minesweeper.Game
     Minesweeper.Model
@@ -77,6 +80,8 @@ test-suite test
   other-modules:
     Breakthrough.Game
     Breakthrough.GameSpec
+    ConnectFour.Game
+    ConnectFour.GameSpec
     Game
     Tictactoe.Game
     Tictactoe.GameSpec

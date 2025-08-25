@@ -11,6 +11,7 @@ import Miso.Html.Property as P
 
 import App.Model
 import Breakthrough.Component as Breakthrough
+import ConnectFour.Component as ConnectFour
 import Minesweeper.Component as Minesweeper
 import Tictactoe.Component as Tictactoe
 
@@ -26,6 +27,7 @@ updateModel (ActionAskGame gt) = do
   case gt of
     "Breakthrough"      -> modelGameType .= Breakthrough
     "Breakthrough 8x6"  -> modelGameType .= Breakthrough86
+    "ConnectFour"       -> modelGameType .= ConnectFour
     "Minesweeper"       -> modelGameType .= Minesweeper
     "Tictactoe"         -> modelGameType .= Tictactoe
     _                   -> pure ()
@@ -42,6 +44,7 @@ viewModel model =
         , select_ [ onChange ActionAskGame ]
             [ option_ [ selected_ (model^.modelGameType == Breakthrough) ]    [ "Breakthrough" ]
             , option_ [ selected_ (model^.modelGameType == Breakthrough86) ]  [ "Breakthrough 8x6" ]
+            , option_ [ selected_ (model^.modelGameType == ConnectFour) ]     [ "ConnectFour" ]
             , option_ [ selected_ (model^.modelGameType == Minesweeper) ]     [ "Minesweeper" ]
             , option_ [ selected_ (model^.modelGameType == Tictactoe) ]       [ "Tictactoe" ]
             ]
@@ -66,6 +69,13 @@ viewModel model =
           , div_ [ key_ ("Breakthrough86"::MisoString) ] +> 
               (model^.modelBreakthrough86 & Breakthrough.mkComponent)
                 { bindings = [ modelBreakthrough86 <--> this ] }
+          ]
+      ConnectFour -> 
+        div_ []
+          [ fmtInfo "ConnectFour" "https://en.wikipedia.org/wiki/Connect_Four" 
+          , div_ [ key_ ("ConnectFour"::MisoString) ] +> 
+              (model^.modelConnectFour & ConnectFour.mkComponent)
+                { bindings = [ modelConnectFour <--> this ] }
           ]
       Minesweeper -> 
         div_ []
