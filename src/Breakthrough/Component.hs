@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Breakthrough.Component (mkComponent) where
@@ -22,8 +23,8 @@ import Breakthrough.Model
 -------------------------------------------------------------------------------
 
 bgColor, bgColorEnd :: CSS.Color
-bgColor = CSS.hex 0x88DD88
-bgColorEnd = CSS.hex 0xDDDDDD
+bgColor = #88DD88
+bgColorEnd = #DDDDDD
 
 cellSize :: Int
 cellSize = 50

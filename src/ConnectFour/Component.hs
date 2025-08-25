@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module ConnectFour.Component (mkComponent) where
@@ -23,8 +24,8 @@ import ConnectFour.Model
 -------------------------------------------------------------------------------
 
 bgColor, bgColorEnd :: CSS.Color
-bgColor = CSS.hex 0x88BBFF
-bgColorEnd = CSS.hex 0xDDDDDD
+bgColor = #88BBFF
+bgColorEnd = #DDDDDD
 
 cellSize :: Int
 cellSize = 40

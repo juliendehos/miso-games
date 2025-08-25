@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Minesweeper.Component (mkComponent) where
@@ -27,30 +28,19 @@ cellFont :: MisoString
 cellFont = "small-caps bold 18px arial"
 
 colorNo, colorYes, colorWrongFlag, colorWrongMine :: CSS.Color
-colorNo = CSS.hex 0xBBBBBB
-colorYes = CSS.hex 0xDDDDDD
-colorWrongFlag = CSS.hex 0x88DD88
-colorWrongMine = CSS.hex 0xDD8888
+colorNo = #BBBBBB
+colorYes = #DDDDDD
+colorWrongFlag = #88DD88
+colorWrongMine = #DD8888
 
 n2color :: Int -> CSS.Color
 n2color = \case
-  1 -> CSS.Hex "0000FF"
-  2 -> CSS.Hex "007B00"
-  3 -> CSS.Hex "FF0000"
-  4 -> CSS.Hex "00007B"
-  5 -> CSS.Hex "7B0000"
+  1 -> #0000FF
+  2 -> #007B00
+  3 -> #FF0000
+  4 -> #00007B
+  5 -> #7B0000
   _ -> CSS.black
-
-{-
-n2color :: Int -> CSS.Color
-n2color = \case
-  1 -> CSS.hex 0x0000FF   -- TODO fix bug
-  2 -> CSS.hex 0x007B00
-  3 -> CSS.hex 0xFF0000
-  4 -> CSS.hex 0x00007B
-  5 -> CSS.hex 0x7B0000
-  _ -> CSS.black
--}
 
 -------------------------------------------------------------------------------
 -- helpers

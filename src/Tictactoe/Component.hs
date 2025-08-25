@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Tictactoe.Component (mkComponent) where
@@ -23,8 +24,8 @@ import Tictactoe.Model
 -------------------------------------------------------------------------------
 
 bgColor, bgColorEnd, fgColor :: CSS.Color
-bgColor = CSS.hex 0x88DD88
-bgColorEnd = CSS.hex 0xDDDDDD
+bgColor = #88DD88
+bgColorEnd = #DDDDDD
 fgColor = CSS.red
 
 cellSize :: Int
