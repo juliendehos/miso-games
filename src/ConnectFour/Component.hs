@@ -23,7 +23,7 @@ import ConnectFour.Model
 -------------------------------------------------------------------------------
 
 bgColor, bgColorEnd :: CSS.Color
-bgColor = CSS.hex 0x8888DD
+bgColor = CSS.hex 0x88BBFF
 bgColorEnd = CSS.hex 0xDDDDDD
 
 cellSize :: Int
@@ -164,35 +164,31 @@ drawCanvas ni nj canvasWidthD canvasHeightD model () = do
   let bg = if model^.modelGame & isRunning then bgColor else bgColorEnd
   drawBackground bg canvasWidthD canvasHeightD
   drawGrid CSS.black nj ni cellSize cellSize canvasWidthD canvasHeightD
-  forGame (model^.modelGame) drawGameCell
+  forGame (model^.modelGame) (drawGameCell ni)
 
-drawGameCell :: Int -> Int -> Cell -> Canvas ()
-drawGameCell i j = \case
-  CellRed -> drawPiece CSS.red i j
-  CellYellow -> drawPiece CSS.yellow i j
+drawGameCell :: Int -> Int -> Int -> Cell -> Canvas ()
+drawGameCell ni i j = \case
+  CellRed -> drawPiece ni CSS.red i j
+  CellYellow -> drawPiece ni CSS.yellow i j
   CellEmpty -> pure ()
 
-drawPiece :: CSS.Color -> Int -> Int -> Canvas ()
-drawPiece col i j = do
+drawPiece :: Int -> CSS.Color -> Int -> Int -> Canvas ()
+drawPiece ni col i' j = do
+
+  let i = ni - i' - 1
 
   Canvas.save ()
   Canvas.translate $ ij2xyC i j
 
   Canvas.beginPath ()
   Canvas.fillStyle (Canvas.color col)
-  Canvas.arc (0, 0, cs03, 0, 2*pi)
+  Canvas.arc (0, 0, cs04, 0, 2*pi)
   Canvas.fill ()
 
   Canvas.restore ()
 
--- TODO
-cs005, cs01, cs02, cs03, cs04, cs08 :: Double
-cs005 = cellSizeD * 0.05
-cs01 = cellSizeD * 0.1
-cs02 = cellSizeD * 0.2
-cs03 = cellSizeD * 0.3
+cs04 :: Double
 cs04 = cellSizeD * 0.4
-cs08 = cellSizeD * 0.8
 
 -------------------------------------------------------------------------------
 -- component

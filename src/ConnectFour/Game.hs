@@ -2,19 +2,17 @@
 {-# LANGUAGE StrictData #-}
 
 module ConnectFour.Game
-  -- TODO
-  -- ( Cell(..)
-  -- , Game
-  -- , Move(..)
-  -- , Player(..)
-  -- , Status(..)
-  -- , forGame
-  -- , getNiNj
-  -- , getStatus
-  -- , mkGame
-  -- , reset
-  -- ) 
-  where
+  ( Cell(..)
+  , Game
+  , Move(..)
+  , Player(..)
+  , Status(..)
+  , forGame
+  , getNiNj
+  , getStatus
+  , mkGame
+  , reset
+  ) where
 
 import Data.Vector qualified as V
 import Data.Vector.Unboxed qualified as U
@@ -147,7 +145,7 @@ checkWin board cell i0 j0
 
 play' :: Move -> Game -> Maybe Game
 play' (Move j) g@Game{..} = 
-  if not (isRunning' g) || i < paramNi
+  if not (isRunning' g) || i >= paramNi
     then Nothing
     else Just $ Game board lastJs status _gameInitialPlayer nextPlayer
   where
@@ -165,7 +163,10 @@ play' (Move j) g@Game{..} =
       | otherwise = (nextS, nextP)
 
 getPossibleMoves' :: Game -> [Move]
-getPossibleMoves' Game{..} = U.ifoldl' f [] _gameLastJs
+getPossibleMoves' g@Game{..} = 
+  if isRunning g
+    then U.ifoldl' f [] _gameLastJs
+    else []
   where
     f acc j i = if i < paramNi then Move j : acc else acc
 

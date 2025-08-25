@@ -8,6 +8,10 @@ import System.Random
 import Bot.Random
 import Game
 
+-------------------------------------------------------------------------------
+-- handling RNG explicitely
+-------------------------------------------------------------------------------
+
 genMove' :: (RandomGen gen, GameClass game move player) => Int -> game -> gen -> (Maybe move, gen)
 genMove' nSims game0 gen0 = (move1, gen1)
   where 
@@ -53,7 +57,9 @@ playout' p game0 gen0 = (scoreForPlayer p game1, gen1)
 
     (game1, gen1) = go game0 gen0
 
-
+-------------------------------------------------------------------------------
+-- handling RNG with MonadState
+-------------------------------------------------------------------------------
 
 genMove :: (MonadState StdGen m, GameClass game move player) => Int -> game -> m (Maybe move)
 genMove nSims game = 
@@ -78,16 +84,6 @@ genMove nSims game =
 -- compute playouts and sum the scores
 computeScore:: (MonadState StdGen m, GameClass game move player) => Int -> player -> game -> m Int
 computeScore nSims player game = sum <$> replicateM nSims (playout player game)
-
-{-
-computeScore:: (MonadState StdGen m, GameClass game move player) => Int -> player -> game -> m Int
-computeScore nSims player game = go nSims 0
-  where
-    go 0 score = pure score
-    go n score = do
-      s <- playout player game
-      go (n - 1) (score + s)
--}
 
 -- randomly plays a game until the end, then computes its score
 playout :: (MonadState StdGen m, GameClass game move player) => player -> game -> m Int
