@@ -1,5 +1,5 @@
 
-.PHONY= update build optim test todo
+.PHONY= update build optim test todo time serve clean
 
 all: clean update test build optim
 
@@ -7,7 +7,7 @@ update:
 	wasm32-wasi-cabal update
 
 todo:
-	find src -name "*.hs" | xargs grep -i todo
+	find src bench spec -name "*.hs" | xargs grep -i todo
 
 test:
 	wasm32-wasi-cabal build spec
