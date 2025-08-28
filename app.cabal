@@ -62,11 +62,11 @@ executable app
   default-extensions:
     CPP TemplateHaskell
 
-test-suite test
+test-suite spec
   main-is:
     Spec.hs
   hs-source-dirs:
-    src
+    spec, src
   type:
     exitcode-stdio-1.0
   build-depends:
@@ -96,7 +96,7 @@ executable time
   main-is:
     Time.hs
   hs-source-dirs:
-    src
+    bench, src
   build-depends:
     base,
     deepseq,
@@ -130,7 +130,7 @@ benchmark criterion
   main-is:
     Bench.hs
   hs-source-dirs:
-    src
+    bench, src
   build-depends:
     base,
     criterion,

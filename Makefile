@@ -10,8 +10,8 @@ todo:
 	find src -name "*.hs" | xargs grep -i todo
 
 test:
-	wasm32-wasi-cabal build test
-	$(eval my_spec=$(shell wasm32-wasi-cabal list-bin test | tail -n 1))
+	wasm32-wasi-cabal build spec
+	$(eval my_spec=$(shell wasm32-wasi-cabal list-bin spec | tail -n 1))
 	wasmi_cli $(my_spec)
 
 time:

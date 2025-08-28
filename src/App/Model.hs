@@ -31,19 +31,29 @@ data AppModel = AppModel
 
 makeLenses ''AppModel
 
+
+#if MIN_VERSION_random(1,3,0)
+mysplit :: SplitGen g => g -> (g, g)
+mysplit = splitGen
+#else
+mysplit :: RandomGen g => g -> (g, g)
+mysplit = split
+#endif
+
+
 mkAppModel :: StdGen -> AppModel
 mkAppModel gen0 = 
   let
-    (gen1, gen1') = splitGen gen0
+    (gen1, gen1') = mysplit gen0
     breakthroughModel = Breakthrough.mkModel 8 8 gen1'
 
-    (gen2, gen2') = splitGen gen1
+    (gen2, gen2') = mysplit gen1
     breakthroughModel86 = Breakthrough.mkModel 8 6 gen2'
 
-    (gen3, gen3') = splitGen gen2
+    (gen3, gen3') = mysplit gen2
     connectFourModel = ConnectFour.mkModel gen3'
 
-    (gen4, gen4') = splitGen gen3
+    (gen4, gen4') = mysplit gen3
     minesweeperModel = runST $ Minesweeper.mkModel Minesweeper.ModeBeginner gen4'
 
     gen5' = gen4

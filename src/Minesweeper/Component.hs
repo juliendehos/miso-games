@@ -117,7 +117,7 @@ viewModel model = div_ []
       , height_ (ms $ ni * cellSize)
       , CSS.style_  [CSS.border "2px solid black"]
       , onPointerUp ActionAskPlay
-      , onContextMenuWithOptions ActionNone (defaultOptions { preventDefault = True })
+      , onContextMenuWithOptions (defaultOptions { _preventDefault = True }) ActionNone 
       ]
     initCanvas
     (drawCanvas model)

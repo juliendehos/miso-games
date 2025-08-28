@@ -37,7 +37,7 @@ make time
 make
 ```
 
-test/bench using ghc:
+Test/bench using ghc:
 
 ```sh
 nix develop .#default
