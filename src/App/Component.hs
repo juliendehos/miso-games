@@ -13,6 +13,7 @@ import App.Model
 import Breakthrough.Component as Breakthrough
 import ConnectFour.Component as ConnectFour
 import Minesweeper.Component as Minesweeper
+import Othello.Component as Othello
 import Tictactoe.Component as Tictactoe
 
 -------------------------------------------------------------------------------
@@ -29,6 +30,7 @@ updateModel (ActionAskGame gt) = do
     "Breakthrough 8x6"  -> modelGameType .= Breakthrough86
     "ConnectFour"       -> modelGameType .= ConnectFour
     "Minesweeper"       -> modelGameType .= Minesweeper
+    "Othello"           -> modelGameType .= Othello
     "Tictactoe"         -> modelGameType .= Tictactoe
     _                   -> pure ()
 
@@ -46,6 +48,7 @@ viewModel model =
             , option_ [ selected_ (model^.modelGameType == Breakthrough86) ]  [ "Breakthrough 8x6" ]
             , option_ [ selected_ (model^.modelGameType == ConnectFour) ]     [ "ConnectFour" ]
             , option_ [ selected_ (model^.modelGameType == Minesweeper) ]     [ "Minesweeper" ]
+            , option_ [ selected_ (model^.modelGameType == Othello) ]         [ "Othello" ]
             , option_ [ selected_ (model^.modelGameType == Tictactoe) ]       [ "Tictactoe" ]
             ]
         ]
@@ -83,6 +86,13 @@ viewModel model =
           , div_ [ key_ ("Minesweeper"::MisoString) ] +> 
               (model^.modelMinesweeper & Minesweeper.mkComponent)
                 { bindings = [ modelMinesweeper <--> this ] }
+          ]
+      Othello -> 
+        div_ []
+          [ fmtInfo "Othello" "https://en.wikipedia.org/wiki/Reversi" 
+          , div_ [ key_ ("Othello"::MisoString) ] +> 
+              (model^.modelOthello & Othello.mkComponent)
+                { bindings = [ modelOthello <--> this ] }
           ]
       Tictactoe -> 
         div_ []

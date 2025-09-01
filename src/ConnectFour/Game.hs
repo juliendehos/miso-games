@@ -72,22 +72,12 @@ instance GameClass Game Move Player where
   getCurrentPlayer = _gameCurrentPlayer
   isRunning = isRunning'
   play = play'
-
-  scoreForPlayer p Game{..} =
-    case (p, _gameStatus) of
-      (PlayerRed,     RedWins)      ->  1
-      (PlayerRed,     YellowWins)   -> -1
-      (PlayerYellow,  YellowWins)   ->  1
-      (PlayerYellow,  RedWins)      -> -1
-      _                             ->  0
+  scoreForPlayer = scoreForPlayer'
 
 mkGame :: Game
 mkGame = Game mkBoard lastJs RedPlays PlayerRed PlayerRed
   where
     lastJs = U.replicate paramNj 0
-
-mkBoard :: Board
-mkBoard = V.replicate (paramNi*paramNj) CellEmpty 
 
 reset :: Game -> Game
 reset g0 = 
@@ -118,6 +108,9 @@ getNiNj = (paramNi, paramNj)
 -- internal
 -------------------------------------------------------------------------------
 
+mkBoard :: Board
+mkBoard = V.replicate (paramNi*paramNj) CellEmpty 
+
 ij2k :: (Int, Int) -> Int
 ij2k (i, j) = i*paramNj + j
 
@@ -126,6 +119,15 @@ k2ij k = (k `div` paramNj, k`rem` paramNj)
 
 isRunning' :: Game -> Bool
 isRunning' Game{..} = _gameStatus == RedPlays || _gameStatus == YellowPlays
+
+scoreForPlayer' :: Player -> Game -> Int
+scoreForPlayer' p Game{..} =
+  case (p, _gameStatus) of
+    (PlayerRed,     RedWins)      ->  1
+    (PlayerRed,     YellowWins)   -> -1
+    (PlayerYellow,  YellowWins)   ->  1
+    (PlayerYellow,  RedWins)      -> -1
+    _                             ->  0
 
 checkWin :: Board -> Cell -> Int -> Int -> Bool
 checkWin board cell i0 j0 

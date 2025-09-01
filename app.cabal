@@ -41,6 +41,9 @@ executable app
     ConnectFour.Component
     ConnectFour.Game
     ConnectFour.Model
+    Othello.Component
+    Othello.Game
+    Othello.Model
     Minesweeper.Component
     Minesweeper.Game
     Minesweeper.Model
