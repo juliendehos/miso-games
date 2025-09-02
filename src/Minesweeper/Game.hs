@@ -1,4 +1,6 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
 {-# OPTIONS -Wno-unused-top-binds #-}
 
@@ -24,7 +26,7 @@ import Control.Monad.ST
 import Data.Bool (bool)
 import Data.Massiv.Array as A
 import Miso.Lens
-import Miso.Lens.TH
+-- import Miso.Lens.TH
 import System.Random.Stateful (uniformRM, StatefulGen)
 
 -------------------------------------------------------------------------------
@@ -62,7 +64,31 @@ data Game = Game
   , _gameNbMines     :: Int
   } deriving (Eq)
 
-makeLenses ''Game
+-- makeLenses ''Game
+
+gameMines :: Lens Game (Array U Ix2 Bool)
+gameMines = lens _gameMines (\ record field -> record {_gameMines = field})
+
+gameNeighbors :: Lens Game (Array P Ix2 Int)
+gameNeighbors = lens _gameNeighbors (\ record field -> record {_gameNeighbors = field})
+
+gameCells :: Lens Game (Array B Ix2 Cell)
+gameCells = lens _gameCells (\ record field -> record {_gameCells = field})
+
+gameStatus :: Lens Game Status
+gameStatus = lens _gameStatus (\ record field -> record {_gameStatus = field})
+
+gameFlags :: Lens Game Int
+gameFlags = lens _gameFlags (\ record field -> record {_gameFlags = field})
+
+gameRemCells :: Lens Game Int
+gameRemCells = lens _gameRemCells (\ record field -> record {_gameRemCells = field})
+
+gameBoardNiNj :: Lens Game (Int, Int)
+gameBoardNiNj = lens _gameBoardNiNj (\ record field -> record {_gameBoardNiNj = field})
+
+gameNbMines :: Lens Game Int
+gameNbMines = lens _gameNbMines (\ record field -> record {_gameNbMines = field})
 
 -------------------------------------------------------------------------------
 -- export

@@ -1,8 +1,10 @@
+{-# LANGUAGE FlexibleContexts #-}
 
 module Bot.MonteCarlo where
 
 import Control.Monad
 import Control.Monad.State.Lazy
+import Data.List (foldl')
 import System.Random
 
 import Bot.Random

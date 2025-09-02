@@ -49,3 +49,12 @@ $(cabal list-bin criterion | tail -n 1) --list
 $(cabal list-bin criterion | tail -n 1) "Breakthrough.Game/play"
 ```
 
+Build/run a docker image:
+
+```sh
+nix develop .#wasm --command bash -c "make"
+nix-build docker.nix
+docker load < result
+docker run --rm -it -p 3000:3000 miso-games:latest
+```
+

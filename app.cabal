@@ -3,6 +3,11 @@ name:             miso-games
 version:          0.1
 
 common options
+  default-language:
+    GHC2021
+  default-extensions:
+    CPP TemplateHaskell LambdaCase
+
   if impl(ghcjs) || arch(javascript)
     cpp-options:
       -DGHCJS_BOTH
@@ -18,6 +23,8 @@ common options
     cpp-options:
        -DWASM
   else
+    ghc-options:
+      -Wall -O2 -ddump-splices
     cpp-options:
       -DVANILLA
 
@@ -60,10 +67,6 @@ executable app
     primitive,
     random,
     vector
-  default-language:
-    GHC2024
-  default-extensions:
-    CPP TemplateHaskell
 
 test-suite spec
   main-is:
@@ -88,12 +91,6 @@ test-suite spec
     Game
     Tictactoe.Game
     Tictactoe.GameSpec
-  default-language:
-    GHC2024
-  default-extensions:
-    CPP TemplateHaskell
-  ghc-options:
-    -Wall -O2
 
 executable time
   main-is:
@@ -120,12 +117,6 @@ executable time
     Minesweeper.GameTime
     Tictactoe.Game
     Tictactoe.GameTime
-  default-language:
-    GHC2024
-  default-extensions:
-    CPP TemplateHaskell
-  ghc-options:
-    -Wall -O2
 
 benchmark criterion
   type:
@@ -154,10 +145,4 @@ benchmark criterion
     Minesweeper.GameBench
     Tictactoe.Game
     Tictactoe.GameBench
-  default-language:
-    GHC2024
-  default-extensions:
-    CPP TemplateHaskell
-  ghc-options:
-    -Wall -O2
 

@@ -1,5 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ImportQualifiedPost #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StrictData #-}
 
@@ -19,7 +22,7 @@ module Breakthrough.Game
   ) where
 
 import Data.List (nub)
-import Data.Vector qualified as V   -- TODO unboxed vector?
+import Data.Vector qualified as V
 
 import GHC.Generics (Generic)
 import Control.DeepSeq

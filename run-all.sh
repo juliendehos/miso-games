@@ -42,3 +42,10 @@ echo "# ghc: bench"
 echo ""###############################################################################
 nix develop .#default --experimental-features "nix-command flakes" --command bash -c "cabal bench"
 
+echo ""
+echo ""###############################################################################
+echo "# docker"
+echo ""###############################################################################
+nix-build docker.nix
+docker load < result
+
