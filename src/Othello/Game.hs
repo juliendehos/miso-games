@@ -74,13 +74,12 @@ instance GameClass Game Move Player where
   scoreForPlayer = scoreForPlayer'
 
 mkGame :: Game
-mkGame = Game board moves BlackPlays PlayerBlack PlayerBlack
-  where
-    board = mkBoard
-    moves = []    -- TODO
+mkGame = mkGame' PlayerBlack
 
 reset :: Game -> Game
-reset = id   -- TODO
+reset Game{..} = case _gameInitialPlayer of
+  PlayerBlack -> mkGame' PlayerWhite
+  PlayerWhite -> mkGame' PlayerBlack
 
 getStatus :: Game -> Status
 getStatus = _gameStatus
@@ -124,7 +123,44 @@ mkBoard =
     , (ij2k (4, 3), CellBlack)
     , (ij2k (4, 4), CellWhite)
     ]
-  
+
+mkGame' :: Player -> Game
+mkGame' player = Game board moves status player player
+  where
+    status = case player of
+      PlayerBlack -> BlackPlays
+      PlayerWhite -> WhitePlays
+    board = mkBoard
+    moves = computeMoves board player
+
+computeMoves :: Board -> Player -> [Move]
+computeMoves board player = V.ifoldl' f [] board
+  where
+    (cell, cellOpp) = 
+      case player of
+        PlayerBlack -> (CellBlack, CellWhite)
+        PlayerWhite -> (CellWhite, CellBlack)
+
+    f acc k c = 
+      let ij = k2ij k
+      in if c == cell && isMove board cellOpp ij then Move ij : acc else acc
+
+isMove :: Board -> Cell -> (Int, Int) -> Bool
+isMove board cellOpp ij = any (isLine board cellOpp ij)
+  [ (-1, -1), ( 1,  1)   -- diag 1
+  , (-1,  1), ( 1, -1)   -- diag 2
+  , ( 0, -1), ( 0,  1)   -- row
+  , (-1,  0), ( 1,  0)   -- col
+  ] 
+
+isLine :: Board -> Cell -> (Int, Int) -> (Int, Int) -> Bool
+isLine board cellOpp (i0, j0) (di, dj) =
+  let ij1@(i1, j1) = (i0+di, j0+dj)
+  in board V.! ij2k ij1 == cellOpp && go (i1+di, j1+dj)
+  where
+    go ij@(i, j) = 
+      let c = board V.! ij2k ij
+      in i>=0 && i<paramNi && j>=0 && j<paramNj && (c == CellEmpty || c == cellOpp && go (i+di, j+dj))
 
 play' :: Move -> Game -> Maybe Game
 play' _ = Just   -- TODO

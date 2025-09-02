@@ -24,7 +24,7 @@ import Othello.Model
 -------------------------------------------------------------------------------
 
 bgColor, bgColorEnd :: CSS.Color
-bgColor = #88BBFF
+bgColor = #009f03
 bgColorEnd = #DDDDDD
 
 cellSize :: Int
